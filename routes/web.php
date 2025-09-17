@@ -28,7 +28,7 @@ Route::get('/registration-success', function () {
 })->name('registration.success');
 
 // Protected routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'profile.completed'])->group(function () {
     // QR Code download routes
     Route::get('/qr-code/download/{type?}', [QRCodeController::class, 'download'])->name('qr.download');
     Route::get('/qr-code/generate/{id}', [QRCodeController::class, 'generate'])->name('qr.generate');

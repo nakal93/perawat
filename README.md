@@ -94,33 +94,102 @@ Sistem manajemen data karyawan rumah sakit dengan fitur registrasi bertahap, QR 
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+# 1. Clone repository
+git clone https://github.com/your-org/perawat.git
+cd perawat
+
+# 2. Install PHP & JS dependencies
 composer install
 npm install
 
-# Setup environment
+# 3. Copy env & generate key
 cp .env.example .env
 php artisan key:generate
 
-# Database setup
-php artisan migrate:fresh --seed
+# 4. (Optional) Adjust DB credentials in .env
+# DB_DATABASE=perawat_db
+# DB_USERNAME=perawat_user
+# DB_PASSWORD=secret
 
-# Build assets
-npm run build
+# 5. Run migrations & seed base data (status pegawai, admin user, dsb.)
+php artisan migrate --seed
 
-# Start NGINX development server (production-like)
-sudo systemctl start nginx
-sudo systemctl start php8.3-fpm
+# 6. Link storage (untuk akses file upload & foto profil)
+php artisan storage:link
 
-# Access application at http://10.10.10.44
+# 7. Build assets (production) atau jalankan dev watcher
+npm run build   # atau: npm run dev
+
+# 8. Jalankan server lokal Laravel
+php artisan serve
+
+# Akses: http://127.0.0.1:8000
 ```
 
-### Default Users
+### Default Users (Seeder)
 
 ```
-Admin: admin@rsdolopo.com / password
-Superuser: superuser@rsdolopo.com / password
+Admin:     admin@rsdolopo.com      / password
+Superuser: superuser@rsdolopo.com  / password
 ```
+
+Jika ingin mengganti password default segera setelah deploy, jalankan tinker atau ubah lewat menu pengaturan akun.
+
+### Struktur Migrasi
+Migrations mencakup:
+- create_users, create_karyawan
+- penambahan field tambahan karyawan (alamat detail, status_perkawinan, dll.)
+- status/relasi master: ruangan, profesi, kategori dokumen
+- dokumen karyawan & relasi
+
+Pastikan urutan otomatis Laravel sudah konsisten; gunakan `php artisan migrate:fresh --seed` bila ingin reset total saat development.
+
+### Seeders
+Seeder menyediakan:
+- Role/Status Pegawai dasar (PNS, PPPK, Kontrak, Honorer)
+- Admin & Superuser default
+- Contoh ruangan & profesi
+
+### Build Aset Frontend
+Gunakan `npm run dev` saat development (HMR/Vite). Untuk produksi: `npm run build`.
+
+### Variabel Lingkungan Penting
+```
+APP_ENV, APP_DEBUG, APP_URL
+DB_CONNECTION, DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+FILESYSTEM_DISK (public) & STORAGE LINK
+MAIL_MAILER (smtp atau log)
+```
+
+### Keamanan & Produksi
+- Pastikan `APP_KEY` tidak kosong.
+- Set `APP_ENV=production` dan `APP_DEBUG=false` di server produksi.
+- Simpan `.env` (jangan commit). Sudah di-`.gitignore`.
+- Backup database terpisah (folder `/storage/backups` sudah di-ignore).
+
+### Deployment Singkat (Contoh)
+1. Pull repo & install dependencies.
+2. Salin `.env` produksi & generate key jika baru.
+3. Jalankan `php artisan migrate --force`.
+4. Jalankan `npm ci && npm run build` atau gunakan artifact build.
+5. Jalankan queue (jika nanti ditambah) & optimasi: `php artisan config:cache route:cache view:cache`.
+
+### Troubleshooting
+| Masalah | Solusi Cepat |
+|---------|--------------|
+| 419 Page Expired | Pastikan APP_KEY dan session driver valid (database table sessions migrated). |
+| Asset 404 | Jalankan `php artisan storage:link` & build Vite. |
+| Foto tidak tampil | Periksa permission `storage/` (www-data read). |
+| Error enum status_kelengkapan | Pastikan migration enum terbaru sudah jalan. |
+
+### Roadmap Singkat
+- Reset password via email
+- Audit log aktivitas karyawan
+- Export laporan PDF
+- Integrasi notifikasi dokumen kadaluarsa (queue + mail)
+
+---
+Jika menemukan bug atau butuh fitur tambahan, buat issue atau pull request.
 
 ## 📱 Mobile-First Features
 ✅ Bottom Navigation untuk easy thumb access
@@ -135,33 +204,6 @@ Superuser: superuser@rsdolopo.com / password
 
 **RS Dolopo Employee Management System** - Built with ❤️ menggunakan Laravel & mobile-first design
 
-## Laravel Sponsors
+## Lisensi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Proyek ini dirilis di bawah lisensi MIT. Lihat file LICENSE bila tersedia atau tambahkan jika belum.

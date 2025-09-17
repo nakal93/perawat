@@ -3,80 +3,33 @@
 @section('title', 'Profil Saya')
 
 @section('content')
+@php
+    $fotoUrl = ($karyawan && $karyawan->foto_profil) ? '/storage/'.ltrim($karyawan->foto_profil,'/') : null;
+@endphp
 <div class="min-h-screen bg-gray-50">
     <div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <!-- Status Card -->
+        <!-- Info Card -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-900 mb-1">Status Pendaftaran</h2>
-                            <p class="text-sm text-gray-600">Pantau progress registrasi Anda</p>
-                        </div>
-                        @if(auth()->user()->status === 'pending')
-                            <div class="flex items-center gap-3">
-                                <div class="w-3 h-3 bg-amber-400 rounded-full animate-pulse"></div>
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-amber-50 border border-amber-200 text-amber-700">
-                                    Menunggu Persetujuan
-                                </span>
-                            </div>
-                        @elseif(auth()->user()->status === 'approved')
-                            <div class="flex items-center gap-3">
-                                <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-50 border border-blue-200 text-blue-700">
-                                    Disetujui - Lengkapi Data
-                                </span>
-                            </div>
-                        @elseif(auth()->user()->status === 'active')
-                            <div class="flex items-center gap-3">
-                                <div class="w-3 h-3 bg-emerald-400 rounded-full"></div>
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-emerald-50 border border-emerald-200 text-emerald-700">
-                                    Aktif
-                                </span>
-                            </div>
-                        @endif
-                    </div>
-
-                    @if(auth()->user()->status === 'pending')
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6">
-                            <div class="flex items-start gap-3">
-                                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                                    <svg class="h-5 w-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-medium text-amber-800 mb-1">Menunggu Persetujuan Admin</h3>
-                                    <p class="text-sm text-amber-700 leading-relaxed">
-                                        Pendaftaran Anda sedang ditinjau oleh tim admin. Anda akan mendapat notifikasi email setelah disetujui.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @elseif(auth()->user()->status === 'approved')
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-                            <div class="flex items-start gap-3">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                    <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-medium text-blue-800 mb-1">Selamat! Pendaftaran Disetujui</h3>
-                                    <p class="text-sm text-blue-700 leading-relaxed">
-                                        Silakan lengkapi data tahap 2 di bawah ini untuk mengaktifkan akun Anda.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-1">Profil Karyawan</h2>
+                    <p class="text-sm text-gray-600">Lengkapi seluruh form di bawah ini, lalu klik Simpan untuk menyempurnakan data.</p>
                 </div>
+                <div class="flex items-center gap-3">
+                    @php $status = auth()->user()->status; @endphp
+                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium {{ $status==='active' ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : ($status==='approved' ? 'bg-blue-50 border border-blue-200 text-blue-700' : 'bg-amber-50 border border-amber-200 text-amber-700') }}">
+                        Status: {{ ucfirst($status) }}
+                    </span>
+                </div>
+            </div>
+        </div>
 
-        <!-- Profile Header Card -->
+    @php($isComplete = ($karyawan->status_kelengkapan === 'lengkap'))
+    <!-- Profile Header Card -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div class="pt-6 pb-8 px-6 sm:pt-8 sm:pb-10 sm:px-8">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-10">
                     <div class="relative w-24 h-24 lg:w-32 lg:h-32 shrink-0 mx-auto lg:mx-0 order-1 mb-6 sm:mb-6 lg:mb-0">
-                        @php $fotoUrl = ($karyawan && $karyawan->foto_profil) ? '/storage/'.ltrim($karyawan->foto_profil,'/') : null; @endphp
                         <div class="w-full h-full rounded-xl border-2 border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center">
                             @if($fotoUrl)
                                 <img src="{{ $fotoUrl }}" alt="Foto Profil" class="w-full h-full object-cover" onclick="openImageModal('{{ $fotoUrl }}', 'Foto Profil - {{ auth()->user()->name }}')">
@@ -129,6 +82,7 @@
                 </div>
             </div>
         </div>
+    @if($isComplete)
     <!-- Data Sections Grid -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-6">
             <!-- Left Column -->
@@ -295,7 +249,7 @@
             </div>
         </div>
 
-        <!-- Quick Actions Grid -->
+    <!-- Quick Actions Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Dokumen Card -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -365,198 +319,211 @@
             @endif
         </div>
 
-        <!-- Registration Form untuk Status Approved -->
-        @if(auth()->user()->status === 'approved' && $karyawan->status_kelengkapan !== 'lengkap')
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
+        @else
+        <!-- Form lengkapi profil (ditampilkan hanya jika belum lengkap) -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">Lengkapi Profil Anda</h3>
+                <p class="text-sm text-gray-600">Isi seluruh field wajib bertanda * untuk mengaktifkan akun. Setelah disimpan, tampilan akan berubah menjadi ringkasan.</p>
+            </div>
+            <form method="POST" action="{{ route('karyawan.profile.update') }}" class="space-y-6" enctype="multipart/form-data">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Foto Profil -->
+                    <div class="sm:col-span-2">
+                        <label for="foto_profil" class="block text-sm font-medium text-gray-700 mb-2">Foto Profil (Opsional)</label>
+                        <input type="file" name="foto_profil" id="foto_profil" accept="image/*" class="w-full rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        @error('foto_profil')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- NIK -->
+                    <div>
+                        <label for="nik" class="block text-sm font-medium text-gray-700 mb-2">NIK</label>
+                        <input type="text" name="nik" id="nik" value="{{ old('nik', $karyawan->nik) }}" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        @error('nik')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- NIP -->
+                    <div>
+                        <label for="nip" class="block text-sm font-medium text-gray-700 mb-2">NIP (Opsional)</label>
+                        <input type="text" name="nip" id="nip" value="{{ old('nip', $karyawan->nip) }}" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        @error('nip')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Jenis Kelamin -->
+                    <div>
+                        <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" id="jenis_kelamin" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            <option value="Laki-laki" @selected($karyawan->jenis_kelamin==='Laki-laki')>Laki-laki</option>
+                            <option value="Perempuan" @selected($karyawan->jenis_kelamin==='Perempuan')>Perempuan</option>
+                        </select>
+                        @error('jenis_kelamin')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Tanggal Lahir -->
+                    <div>
+                        <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir', $karyawan->tanggal_lahir) }}" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        @error('tanggal_lahir')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Golongan Darah -->
+                    <div>
+                        <label for="golongan_darah" class="block text-sm font-medium text-gray-700 mb-2">Golongan Darah</label>
+                        <select name="golongan_darah" id="golongan_darah" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Tidak tahu</option>
+                            @foreach(['A','B','AB','O'] as $g)
+                                <option value="{{ $g }}" @selected($karyawan->golongan_darah===$g)> {{ $g }} </option>
+                            @endforeach
+                        </select>
+                        @error('golongan_darah')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Status Perkawinan -->
+                    <div>
+                        <label for="status_perkawinan" class="block text-sm font-medium text-gray-700 mb-2">Status Perkawinan</label>
+                        <select name="status_perkawinan" id="status_perkawinan" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            <option value="Belum Kawin" @selected($karyawan->status_perkawinan==='Belum Kawin')>Belum Kawin</option>
+                            <option value="Kawin" @selected($karyawan->status_perkawinan==='Kawin')>Kawin</option>
+                            <option value="Cerai Hidup" @selected($karyawan->status_perkawinan==='Cerai Hidup')>Cerai Hidup</option>
+                            <option value="Cerai Mati" @selected($karyawan->status_perkawinan==='Cerai Mati')>Cerai Mati</option>
+                        </select>
+                        @error('status_perkawinan')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- No HP -->
+                    <div>
+                        <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
+                        <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', $karyawan->no_hp) }}" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="0812...">
+                        @error('no_hp')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Nama Ibu Kandung -->
+                    <div>
+                        <label for="nama_ibu_kandung" class="block text-sm font-medium text-gray-700 mb-2">Nama Ibu Kandung</label>
+                        <input type="text" name="nama_ibu_kandung" id="nama_ibu_kandung" value="{{ old('nama_ibu_kandung', $karyawan->nama_ibu_kandung) }}" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        @error('nama_ibu_kandung')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Alamat Detail & Wilayah -->
+                    <div class="sm:col-span-2 space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Alamat Domisili</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <select id="provinsi_id" name="provinsi_id" class="rounded-lg border-gray-300 h-10 text-sm" data-selected="{{ old('provinsi_id', $karyawan->provinsi_id) }}">
+                                <option value="">Provinsi</option>
+                            </select>
+                            <select id="kabupaten_id" name="kabupaten_id" class="rounded-lg border-gray-300 h-10 text-sm" data-selected="{{ old('kabupaten_id', $karyawan->kabupaten_id) }}" disabled>
+                                <option value="">Kab/Kota</option>
+                            </select>
+                            <select id="kecamatan_id" name="kecamatan_id" class="rounded-lg border-gray-300 h-10 text-sm" data-selected="{{ old('kecamatan_id', $karyawan->kecamatan_id) }}" disabled>
+                                <option value="">Kecamatan</option>
+                            </select>
+                            <select id="kelurahan_id" name="kelurahan_id" class="rounded-lg border-gray-300 h-10 text-sm" data-selected="{{ old('kelurahan_id', $karyawan->kelurahan_id) }}" disabled>
+                                <option value="">Kelurahan</option>
+                            </select>
+                        </div>
+                        <textarea id="alamat_detail" name="alamat_detail" rows="2" class="w-full rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Detail (RT/RW, Jalan, Blok)">{{ old('alamat_detail', $karyawan->alamat_detail) }}</textarea>
+                        <div id="alamat_preview" class="text-xs"></div>
+                        <input type="hidden" id="alamat" name="alamat" value="{{ old('alamat', $karyawan->alamat) }}">
+                        @error('alamat')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Kepegawaian: Status, Ruangan, Profesi, Tgl Masuk -->
+                    <div>
+                        <label for="status_pegawai_id" class="block text-sm font-medium text-gray-700 mb-2">Status Pegawai</label>
+                        <select name="status_pegawai_id" id="status_pegawai_id" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            @foreach(\App\Models\StatusPegawai::orderBy('nama')->get() as $st)
+                                <option value="{{ $st->id }}" @selected($karyawan->status_pegawai_id==$st->id)>{{ $st->nama }}</option>
+                            @endforeach
+                        </select>
+                        @error('status_pegawai_id')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-900">Lengkapi Data Registrasi</h3>
-                        <p class="text-sm text-gray-600">Tahap 2: Isi data lengkap untuk mengaktifkan akun Anda</p>
+                        <label for="ruangan_id" class="block text-sm font-medium text-gray-700 mb-2">Ruangan</label>
+                        <select name="ruangan_id" id="ruangan_id" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            @foreach(\App\Models\Ruangan::orderBy('nama_ruangan')->get() as $r)
+                                <option value="{{ $r->id }}" @selected($karyawan->ruangan_id==$r->id)>{{ $r->nama_ruangan }}</option>
+                            @endforeach
+                        </select>
+                        @error('ruangan_id')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="profesi_id" class="block text-sm font-medium text-gray-700 mb-2">Profesi</label>
+                        <select name="profesi_id" id="profesi_id" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih</option>
+                            @foreach(\App\Models\Profesi::orderBy('nama_profesi')->get() as $p)
+                                <option value="{{ $p->id }}" @selected($karyawan->profesi_id==$p->id)>{{ $p->nama_profesi }}</option>
+                            @endforeach
+                        </select>
+                        @error('profesi_id')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="tanggal_masuk_kerja" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Masuk Kerja</label>
+                        <input type="date" name="tanggal_masuk_kerja" id="tanggal_masuk_kerja" value="{{ old('tanggal_masuk_kerja', $karyawan->tanggal_masuk_kerja) }}" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        @error('tanggal_masuk_kerja')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Agama -->
+                    <div>
+                        <label for="agama" class="block text-sm font-medium text-gray-700 mb-2">Agama</label>
+                        <select name="agama" id="agama" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih Agama</option>
+                            @foreach(['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu','Lainnya'] as $opt)
+                                <option value="{{ $opt }}" @selected($karyawan->agama===$opt)>{{ $opt }}</option>
+                            @endforeach
+                        </select>
+                        @error('agama')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Pendidikan Terakhir -->
+                    <div>
+                        <label for="pendidikan_terakhir" class="block text-sm font-medium text-gray-700 mb-2">Pendidikan Terakhir</label>
+                        <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $karyawan->pendidikan_terakhir) }}" required class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="contoh: S1 Keperawatan">
+                        @error('pendidikan_terakhir')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Gelar -->
+                    <div>
+                        <label for="gelar" class="block text-sm font-medium text-gray-700 mb-2">Gelar (Opsional)</label>
+                        <input type="text" name="gelar" id="gelar" value="{{ old('gelar', $karyawan->gelar) }}" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="S.Kep, Ners">
+                        @error('gelar')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Kampus -->
+                    <div>
+                        <label for="kampus" class="block text-sm font-medium text-gray-700 mb-2">Asal Kampus (Opsional)</label>
+                        <input type="text" name="kampus" id="kampus" value="{{ old('kampus', $karyawan->kampus) }}" class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Universitas ...">
+                        @error('kampus')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                 </div>
-
-                <form method="POST" action="{{ route('karyawan.complete') }}" class="space-y-6">
-                    @csrf
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <!-- NIK -->
-                        <div>
-                            <label for="nik" class="block text-sm font-medium text-gray-700 mb-2">NIK</label>
-                            <input type="text" name="nik" id="nik" value="{{ old('nik') }}" required
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="Nomor Induk Kependudukan">
-                            @error('nik')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- NIP -->
-                        <div>
-                            <label for="nip" class="block text-sm font-medium text-gray-700 mb-2">NIP (Opsional)</label>
-                            <input type="text" name="nip" id="nip" value="{{ old('nip') }}"
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="Nomor Induk Pegawai">
-                            @error('nip')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Jenis Kelamin -->
-                        <div>
-                            <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
-                            <select name="jenis_kelamin" id="jenis_kelamin" required 
-                                    class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Jenis Kelamin</option>
-                                <option value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="Perempuan" {{ old('jenis_kelamin') === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-                            </select>
-                            @error('jenis_kelamin')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Tanggal Lahir -->
-                        <div>
-                            <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
-                            @error('tanggal_lahir')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Alamat -->
-                        <div class="sm:col-span-2">
-                            <label for="alamat" class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap</label>
-                            <textarea name="alamat" id="alamat" rows="3" required
-                                      class="w-full rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                      placeholder="Masukkan alamat lengkap">{{ old('alamat') }}</textarea>
-                            @error('alamat')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- No HP -->
-                        <div>
-                            <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
-                            <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp') }}" required
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="contoh: 08123456789">
-                            @error('no_hp')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Golongan Darah -->
-                        <div>
-                            <label for="golongan_darah" class="block text-sm font-medium text-gray-700 mb-2">Golongan Darah</label>
-                            <select name="golongan_darah" id="golongan_darah" required 
-                                    class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Golongan Darah</option>
-                                <option value="A" {{ old('golongan_darah') === 'A' ? 'selected' : '' }}>A</option>
-                                <option value="B" {{ old('golongan_darah') === 'B' ? 'selected' : '' }}>B</option>
-                                <option value="AB" {{ old('golongan_darah') === 'AB' ? 'selected' : '' }}>AB</option>
-                                <option value="O" {{ old('golongan_darah') === 'O' ? 'selected' : '' }}>O</option>
-                            </select>
-                            @error('golongan_darah')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Status Perkawinan -->
-                        <div>
-                            <label for="status_perkawinan" class="block text-sm font-medium text-gray-700 mb-2">Status Perkawinan</label>
-                            <select name="status_perkawinan" id="status_perkawinan" required 
-                                    class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Status</option>
-                                <option value="Belum Kawin" {{ old('status_perkawinan') === 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
-                                <option value="Kawin" {{ old('status_perkawinan') === 'Kawin' ? 'selected' : '' }}>Kawin</option>
-                                <option value="Cerai Hidup" {{ old('status_perkawinan') === 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
-                                <option value="Cerai Mati" {{ old('status_perkawinan') === 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
-                            </select>
-                            @error('status_perkawinan')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Nama Ibu Kandung -->
-                        <div>
-                            <label for="nama_ibu_kandung" class="block text-sm font-medium text-gray-700 mb-2">Nama Ibu Kandung</label>
-                            <input type="text" name="nama_ibu_kandung" id="nama_ibu_kandung" value="{{ old('nama_ibu_kandung') }}" required
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="Nama lengkap ibu kandung">
-                            @error('nama_ibu_kandung')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Agama -->
-                        <div>
-                            <label for="agama" class="block text-sm font-medium text-gray-700 mb-2">Agama</label>
-                            <select name="agama" id="agama" required 
-                                    class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Agama</option>
-                                @foreach(['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu','Lainnya'] as $opt)
-                                    <option value="{{ $opt }}" {{ old('agama', $karyawan->agama ?? '') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                                @endforeach
-                            </select>
-                            @error('agama')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Pendidikan Terakhir -->
-                        <div>
-                            <label for="pendidikan_terakhir" class="block text-sm font-medium text-gray-700 mb-2">Pendidikan Terakhir</label>
-                            <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" 
-                                   value="{{ old('pendidikan_terakhir') }}" required
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="contoh: S1 Keperawatan">
-                            @error('pendidikan_terakhir')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Gelar -->
-                        <div>
-                            <label for="gelar" class="block text-sm font-medium text-gray-700 mb-2">Gelar (Opsional)</label>
-                            <input type="text" name="gelar" id="gelar" 
-                                   value="{{ old('gelar') }}"
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="contoh: S.Kep, Ners">
-                            @error('gelar')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Kampus -->
-                        <div>
-                            <label for="kampus" class="block text-sm font-medium text-gray-700 mb-2">Asal Kampus (Opsional)</label>
-                            <input type="text" name="kampus" id="kampus" 
-                                   value="{{ old('kampus') }}"
-                                   class="w-full h-12 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="contoh: Universitas Indonesia">
-                            @error('kampus')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="pt-6 border-t border-gray-200">
-                        <button type="submit" 
-                                class="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-colors focus:ring-4 focus:ring-blue-200">
-                            Lengkapi Registrasi
-                        </button>
-                    </div>
-                </form>
-            </div>
-            @endif
+                <div class="pt-6 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center gap-4">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-colors focus:ring-4 focus:ring-blue-200">Simpan & Selesaikan</button>
+                    <p class="text-xs text-gray-500">Setelah lengkap, Anda akan melihat tampilan ringkasan.</p>
+                </div>
+            </form>
+        </div>
+        @endif
     </div>
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/wilayah-selector.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    WilayahSelector.init({
+        preselect: {
+            provinsi_id: document.getElementById('provinsi_id')?.dataset.selected || '{{ $karyawan->provinsi_id }}',
+            kabupaten_id: document.getElementById('kabupaten_id')?.dataset.selected || '{{ $karyawan->kabupaten_id }}',
+            kecamatan_id: document.getElementById('kecamatan_id')?.dataset.selected || '{{ $karyawan->kecamatan_id }}',
+            kelurahan_id: document.getElementById('kelurahan_id')?.dataset.selected || '{{ $karyawan->kelurahan_id }}'
+        }
+    });
+});
+</script>
+@endpush

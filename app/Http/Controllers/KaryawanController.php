@@ -152,9 +152,7 @@ class KaryawanController extends Controller
         $user = auth()->user();
         $existing = $user->karyawan;
         $allowWhenMissingCore = $existing && (empty($existing->nik) || empty($existing->status_pegawai_id) || empty($existing->tanggal_lahir) || ((optional($existing->statusPegawai)->nama === 'PNS' || optional($existing->statusPegawai)->nama === 'PPPK') && empty($existing->nip)));
-        if ($user->status !== 'pending' && !$allowWhenMissingCore) {
-            return redirect()->back()->with('error', 'Profil tidak dapat diubah setelah disetujui.');
-        }
+        // Izinkan update dari halaman profil untuk melengkapi data sebelum akses fitur lain
 
         $validated = $request->validate([
             'nik' => 'required|string|max:16|unique:karyawan,nik,' . ($user->karyawan->id ?? 'NULL'),
@@ -165,6 +163,21 @@ class KaryawanController extends Controller
             'ruangan_id' => 'required|exists:ruangan,id',
             'profesi_id' => 'required|exists:profesi,id',
             'status_pegawai_id' => 'required|exists:status_pegawai,id',
+            'agama' => 'required|string|max:50',
+            'pendidikan_terakhir' => 'required|string|max:100',
+            'gelar' => 'nullable|string|max:50',
+            'kampus' => 'nullable|string|max:100',
+            'foto_profil' => 'nullable|image|max:2048',
+            'provinsi_id' => 'required|exists:provinsi,id',
+            'kabupaten_id' => 'required|exists:kabupaten,id',
+            'kecamatan_id' => 'required|exists:kecamatan,id',
+            'kelurahan_id' => 'required|exists:kelurahan,id',
+            'no_hp' => 'nullable|string|max:25',
+            'nama_ibu_kandung' => 'nullable|string|max:100',
+            'golongan_darah' => 'nullable|string|max:3',
+            'status_perkawinan' => 'nullable|string|max:30',
+            'tanggal_masuk_kerja' => 'nullable|date',
+            'alamat_detail' => 'nullable|string|max:500',
         ]);
 
         // Validasi tambahan: nip wajib jika status pegawai PNS atau PPPK
@@ -175,10 +188,28 @@ class KaryawanController extends Controller
         }
 
         $karyawan = $user->karyawan ?? new Karyawan(['user_id' => $user->id]);
+
+        // handle foto
+        if ($request->hasFile('foto_profil')) {
+            if ($karyawan->foto_profil) {
+                \Storage::disk('public')->delete($karyawan->foto_profil);
+            }
+            $validated['foto_profil'] = $request->file('foto_profil')->store('foto-profil', 'public');
+        }
+
         $karyawan->fill($validated);
         $karyawan->save();
 
-        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+        // Tandai lengkap bila semua kunci ada
+        $coreOk = $karyawan->nik && $karyawan->status_pegawai_id && $karyawan->tanggal_lahir && $karyawan->jenis_kelamin && $karyawan->alamat && $karyawan->ruangan_id && $karyawan->profesi_id && $karyawan->agama && $karyawan->pendidikan_terakhir;
+        if ($coreOk) {
+            $karyawan->update(['status_kelengkapan' => 'lengkap']);
+            if ($user->status !== 'active') {
+                $user->update(['status' => 'active']);
+            }
+        }
+
+        return redirect()->route('karyawan.profile')->with('success', 'Profil berhasil disimpan.');
     }
 
     public function completeRegistration(Request $request)
@@ -189,6 +220,7 @@ class KaryawanController extends Controller
             return redirect()->back()->with('error', 'Registrasi dapat dilengkapi setelah disetujui admin.');
         }
 
+        // Tahap 2 fields only (no duplicates from tahap 1)
         $validated = $request->validate([
             'foto_profil' => 'nullable|image|max:2048',
             'agama' => 'required|string|max:50',
@@ -206,9 +238,9 @@ class KaryawanController extends Controller
             $validated['foto_profil'] = $request->file('foto_profil')->store('foto-profil', 'public');
         }
 
-        $karyawan->update($validated);
-        $karyawan->update(['status_kelengkapan' => 'tahap2']);
-        $user->update(['status' => 'active']);
+    $karyawan->update($validated);
+    $karyawan->update(['status_kelengkapan' => 'lengkap']);
+    $user->update(['status' => 'active']);
 
         return redirect()->back()->with('success', 'Registrasi berhasil dilengkapi.');
     }
@@ -257,27 +289,21 @@ class KaryawanController extends Controller
         // Update karyawan profile fields kalau ada input
         if ($karyawan) {
             $profileFields = [
-                'nik','nip','status_pegawai_id','tanggal_lahir','jenis_kelamin','alamat','alamat_detail','provinsi_id','kabupaten_id','kecamatan_id','kelurahan_id','ruangan_id','profesi_id','agama','pendidikan_terakhir','gelar','kampus','no_hp','golongan_darah','status_perkawinan','nama_ibu_kandung','tanggal_masuk_kerja'
+                'nik','nip','alamat','jenis_kelamin','tanggal_lahir','ruangan_id','profesi_id','status_pegawai_id',
+                'agama','pendidikan_terakhir','gelar','kampus','no_hp','nama_ibu_kandung','golongan_darah','status_perkawinan',
+                'tanggal_masuk_kerja','alamat_detail','provinsi_id','kabupaten_id','kecamatan_id','kelurahan_id'
             ];
             $updatePayload = [];
             foreach ($profileFields as $f) {
                 if (array_key_exists($f, $data)) {
                     $val = $data[$f];
-                    if ($f === 'golongan_darah' && $val === 'NA') { $val = null; }
-                    if ($val === '') { $val = null; }
+                    // Jangan timpa nilai lama dengan kosong untuk field opsional
+                    if ($val === '' || $val === null) {
+                        // Lewati update untuk menjaga nilai lama
+                        continue;
+                    }
+                    if ($val === 'NA') { $val = null; }
                     $updatePayload[$f] = $val;
-                }
-            }
-            // Re-compose alamat string if granular parts provided and alamat not explicitly posted
-            $hasGranular = ($data['provinsi_id'] ?? null) || ($data['kabupaten_id'] ?? null) || ($data['kecamatan_id'] ?? null) || ($data['kelurahan_id'] ?? null) || ($data['alamat_detail'] ?? null);
-            if ($hasGranular) {
-                // build readable string from available relation names if loaded, else fallback to existing alamat_detail + ids
-                $parts = [];
-                if (!empty($updatePayload['alamat_detail'])) $parts[] = $updatePayload['alamat_detail'];
-                // We might not have loaded relations here; keep original alamat if no detail
-                // Simpler: Keep existing alamat if not overwritten by hidden field (already provided). Hidden field should carry composed value.
-                if (isset($data['alamat'])) {
-                    $updatePayload['alamat'] = $data['alamat'];
                 }
             }
             if (!empty($updatePayload)) {

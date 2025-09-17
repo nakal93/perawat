@@ -106,13 +106,21 @@
                             </svg>
                             Password
                         </label>
-                        <input id="password" 
-                               type="password" 
-                               name="password" 
-                               required 
-                               autocomplete="current-password"
-                               class="input-glow w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200"
-                               placeholder="masukkan password">
+                        <div class="relative">
+                            <input id="password" 
+                                   type="password" 
+                                   name="password" 
+                                   required 
+                                   autocomplete="current-password"
+                                   class="input-glow w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200"
+                                   placeholder="masukkan password">
+                            <button type="button" id="togglePassword" aria-label="Tampilkan password" title="Tampilkan/Sembunyikan password" class="absolute inset-y-0 right-0 px-3 flex items-center text-white/70 hover:text-white">
+                                <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                        </div>
                         @error('password')
                             <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
                         @enderror
@@ -164,4 +172,24 @@
         </div>
     </div>
 </body>
+<script>
+    // Simple eye toggle
+    (function(){
+        const btn = document.getElementById('togglePassword');
+        const input = document.getElementById('password');
+        if(btn && input){
+            btn.addEventListener('click', function(){
+                const showing = input.type === 'text';
+                input.type = showing ? 'password' : 'text';
+                // toggle icon (swap to crossed eye when showing)
+                const eye = document.getElementById('eyeIcon');
+                if(eye){
+                    eye.innerHTML = showing
+                        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>'
+                        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.058 10.058 0 012.66-4.304m3.2-2.163A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.057 10.057 0 01-4.429 5.818M15 12a3 3 0 00-3-3m0 0a3 3 0 013 3m-3-3L3 21"/>';
+                }
+            });
+        }
+    })();
+    </script>
 </html>

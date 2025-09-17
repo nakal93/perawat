@@ -38,3 +38,6 @@ debug_*.php
 /storage/framework/cache/*
 /storage/framework/sessions/*
 /storage/framework/views/*
+
+# Local backups (SQL dumps etc.)
+/storage/backups

@@ -1,6 +1,20 @@
 // Indonesian Regional Address Selector
 window.WilayahSelector = {
     init(options = {}) {
+        // prevent duplicate bindings; allow re-applying preselect when already initialized
+        if (this._initialized) {
+            if (options && options.preselect) {
+                this.preselect = options.preselect;
+                // Attempt to apply preselected values if selects exist
+                try {
+                    if (this.provinsiSelect && this.preselect.provinsi_id) {
+                        this.provinsiSelect.value = this.preselect.provinsi_id;
+                        this.onProvinsiChange(this.preselect.provinsi_id, true);
+                    }
+                } catch(e) { /* noop */ }
+            }
+            return;
+        }
         // options: { prefix, ids: {provinsi,kabupaten,kecamatan,kelurahan,detail,preview,hidden}, preselect: {provinsi_id,...} }
         const ids = options.ids || {};
         this.provinsiSelect = document.getElementById(ids.provinsi || 'provinsi_id');
@@ -27,6 +41,7 @@ window.WilayahSelector = {
                 this.onProvinsiChange(this.preselect.provinsi_id, true);
             }
         });
+    this._initialized = true;
     },
 
     bindEvents() {

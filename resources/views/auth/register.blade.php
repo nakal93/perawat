@@ -157,7 +157,16 @@
 
             <!-- Register Card -->
             <div class="glass-card rounded-2xl shadow-2xl p-8">
-                <form method="POST" action="{{ route('register') }}" class="space-y-8" x-data="{ ruangan: '{{ old('ruangan_id') }}', profesi: '{{ old('profesi_id') }}' }" x-init="WilayahSelector.init()">
+                <form method="POST" action="{{ route('register') }}" class="space-y-8" x-data="{ ruangan: '{{ old('ruangan_id') }}', profesi: '{{ old('profesi_id') }}' }" x-init="() => {
+                    WilayahSelector.init({
+                        preselect: {
+                            provinsi_id: '{{ old('provinsi_id') }}',
+                            kabupaten_id: '{{ old('kabupaten_id') }}',
+                            kecamatan_id: '{{ old('kecamatan_id') }}',
+                            kelurahan_id: '{{ old('kelurahan_id') }}'
+                        }
+                    });
+                }">
                     @csrf
 
                     <!-- Section 1: Data Dasar -->
@@ -227,17 +236,18 @@
                             </div>
 
                             <!-- Password -->
-                            <div>
+                <div>
                                 <label for="password" class="block text-sm font-medium text-white mb-2">
                                     Password
                                 </label>
-                                <input id="password" 
-                                       type="password" 
-                                       name="password" 
-                                       required 
-                                       autocomplete="new-password"
-                                       class="input-glow w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200"
-                                       placeholder="Minimal 8 karakter">
+                    <input id="password" 
+                        type="password" 
+                        name="password" 
+                        required 
+                        autocomplete="new-password"
+                        class="input-glow w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200"
+                        placeholder="Min 6, 1 huruf besar & 1 angka">
+                    <p id="pwHint" class="mt-2 text-xs text-white/80">Syarat: minimal 6 karakter, mengandung huruf besar dan angka.</p>
                                 @error('password')
                                     <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
                                 @enderror
@@ -464,6 +474,19 @@
             const previewEl = document.getElementById('alamat_preview');
             const form = document.querySelector('form[action="{{ route('register') }}"]');
             const regionIds = ['provinsi_id','kabupaten_id','kecamatan_id','kelurahan_id'];
+            const pw = document.getElementById('password');
+            const pwc = document.getElementById('password_confirmation');
+
+            function validatePasswordInline() {
+                if (!pw) return true;
+                const val = pw.value || '';
+                const ok = val.length >= 6 && /[A-Z]/.test(val) && /\d/.test(val);
+                const hint = document.getElementById('pwHint');
+                if (hint) {
+                    hint.className = 'mt-2 text-xs ' + (ok ? 'text-emerald-300' : 'text-red-300');
+                }
+                return ok;
+            }
 
             function composeAlamat() {
                 const detail = alamatDetailEl.value.trim();
@@ -512,6 +535,17 @@
                         alert('Alamat belum lengkap. Lengkapi detail alamat dan pilih wilayah.');
                         return;
                     }
+                    // quick client-side password check
+                    if (!validatePasswordInline()) {
+                        e.preventDefault();
+                        alert('Password belum memenuhi syarat (min 6, huruf besar, angka).');
+                        return;
+                    }
+                    if (pwc && pw && pw.value !== pwc.value) {
+                        e.preventDefault();
+                        alert('Konfirmasi password tidak cocok.');
+                        return;
+                    }
                     if (submitting) {
                         e.preventDefault();
                         return;
@@ -529,6 +563,9 @@
             // Initial compose (in case of old() values)
             composeAlamat();
             updatePreview();
+            if (pw) {
+                pw.addEventListener('input', validatePasswordInline);
+            }
         });
     </script>
 </body>

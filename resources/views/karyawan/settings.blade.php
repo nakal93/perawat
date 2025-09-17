@@ -36,14 +36,16 @@
             <div class="p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg">{{ session('success') }}</div>
         @endif
 
-    <div id="akun" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
+    <form action="{{ route('karyawan.settings.update') }}" method="POST" enctype="multipart/form-data" id="settingsUnifiedForm">
+            @csrf
+            @method('PATCH')
+            <!-- Akun -->
+            <div id="akun" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
             <div class="flex items-center gap-2 mb-4">
                 <span class="w-1.5 h-6 rounded bg-gradient-to-b from-blue-500 to-indigo-600"></span>
                 <h2 class="text-lg font-semibold text-slate-900">Akun</h2>
             </div>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                @csrf
-                @method('PATCH')
+                <div class="space-y-4">
                 @php
                     $akunErrorKeys = ['name','email','foto_profil'];
                     $akunErrors = [];
@@ -85,10 +87,8 @@
                     </div>
                     @error('foto_profil')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
-                <div class="pt-2">
-                    <button class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Simpan</button>
                 </div>
-            </form>
+            </div>
         </div>
 
     <div id="identitas" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
@@ -96,9 +96,7 @@
                 <span class="w-1.5 h-6 rounded bg-gradient-to-b from-teal-500 to-emerald-600"></span>
                 <h2 class="text-lg font-semibold">Identitas</h2>
             </div>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PATCH')
+            <div class="space-y-4">
                 @php
                     $identitasKeys = ['nik','nip','tanggal_lahir','jenis_kelamin','alamat','golongan_darah'];
                     $identitasErrors = [];
@@ -141,13 +139,10 @@
                     <div>
                         <label class="block text-sm text-slate-600 mb-1">Golongan Darah</label>
                         <select name="golongan_darah" class="w-full border rounded-lg h-10 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                            @php $gd = old('golongan_darah', $karyawan->golongan_darah ?? ''); @endphp
-                            <option value="">- Pilih -</option>
-                            <option value="NA" @selected($gd==='NA')>Tidak tahu</option>
-                            <option value="A" @selected($gd==='A')>A</option>
-                            <option value="B" @selected($gd==='B')>B</option>
-                            <option value="AB" @selected($gd==='AB')>AB</option>
-                            <option value="O" @selected($gd==='O')>O</option>
+                            <option value="">Tidak tahu</option>
+                            @foreach(['A','B','AB','O'] as $g)
+                                <option value="{{ $g }}" @selected(($karyawan->golongan_darah ?? '')===$g)> {{ $g }} </option>
+                            @endforeach
                         </select>
                         @error('golongan_darah')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
@@ -172,12 +167,7 @@
                         @error('alamat')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </fieldset>
                 </div>
-                <div class="pt-3">
-                    <button aria-label="Simpan Identitas" class="w-full sm:w-auto px-6 py-3 text-base font-semibold rounded-lg shadow-lg border border-emerald-800 text-white bg-emerald-800 hover:bg-emerald-900 focus:outline-none focus:ring-4 focus:ring-emerald-500 focus:ring-offset-2" style="background-color:#065f46;color:#fff;border-color:#064e3b;">
-                        Simpan Identitas
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
 
     <div id="kepegawaian" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
@@ -185,9 +175,7 @@
                 <span class="w-1.5 h-6 rounded bg-gradient-to-b from-purple-500 to-fuchsia-600"></span>
                 <h2 class="text-lg font-semibold">Kepegawaian</h2>
             </div>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PATCH')
+            <div class="space-y-4">
                 @php
                     $kepegawaianKeys = ['status_pegawai_id','tanggal_masuk_kerja','profesi_id','ruangan_id','agama','status_perkawinan'];
                     $kepegawaianErrors = [];
@@ -240,33 +228,28 @@
                     </div>
                     <div>
                         <label class="block text-sm text-slate-600 mb-1">Agama</label>
-                        @php $ag = old('agama', $karyawan->agama ?? ''); @endphp
                         <select name="agama" class="w-full border rounded-lg h-10 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                            <option value="">- Pilih -</option>
+                            <option value="">Pilih Agama</option>
                             @foreach(['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu','Lainnya'] as $opt)
-                                <option value="{{ $opt }}" @selected($ag===$opt)>{{ $opt }}</option>
+                                <option value="{{ $opt }}" @selected(($karyawan->agama ?? '')===$opt)>{{ $opt }}</option>
                             @endforeach
                         </select>
                         @error('agama')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-sm text-slate-600 mb-1">Status Perkawinan</label>
-                        @php $sp = old('status_perkawinan', $karyawan->status_perkawinan ?? ''); @endphp
                         <select name="status_perkawinan" class="w-full border rounded-lg h-10 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                            <option value="">- Pilih -</option>
-                            <option value="Belum" @selected($sp==='Belum')>Belum Menikah</option>
-                            <option value="Menikah" @selected($sp==='Menikah')>Menikah</option>
-                            <option value="Cerai" @selected($sp==='Cerai')>Cerai</option>
+                            <option value="">Pilih</option>
+                            @php $sp = $karyawan->status_perkawinan ?? ''; @endphp
+                            <option value="Belum Kawin" @selected($sp==='Belum Kawin')>Belum Kawin</option>
+                            <option value="Kawin" @selected($sp==='Kawin')>Kawin</option>
+                            <option value="Cerai Hidup" @selected($sp==='Cerai Hidup')>Cerai Hidup</option>
+                            <option value="Cerai Mati" @selected($sp==='Cerai Mati')>Cerai Mati</option>
                         </select>
                         @error('status_perkawinan')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
-                <div class="pt-3">
-                    <button aria-label="Simpan Kepegawaian" class="w-full sm:w-auto px-6 py-3 text-base font-semibold rounded-lg shadow-lg border border-fuchsia-800 text-white bg-fuchsia-800 hover:bg-fuchsia-900 focus:outline-none focus:ring-4 focus:ring-fuchsia-500 focus:ring-offset-2" style="background-color:#701a75;color:#fff;border-color:#4a044e;">
-                        Simpan Kepegawaian
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
 
     <div id="kontak" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
@@ -274,9 +257,7 @@
         <span class="w-1.5 h-6 rounded bg-gradient-to-b from-rose-500 to-orange-500"></span>
         <h2 class="text-lg font-semibold">Kontak</h2>
         </div>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PATCH')
+            <div class="space-y-4">
                 @php
                     $kontakKeys = ['no_hp'];
                     $kontakErrors = [];
@@ -296,8 +277,7 @@
                         @error('no_hp')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
-                <div class="pt-2"><button class="w-full sm:w-auto px-6 py-3 bg-rose-600 text-white rounded-lg shadow-md hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500">Simpan Kontak</button></div>
-            </form>
+            </div>
         </div>
 
     <div id="pendidikan" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
@@ -305,9 +285,7 @@
                 <span class="w-1.5 h-6 rounded bg-gradient-to-b from-cyan-500 to-sky-500"></span>
                 <h2 class="text-lg font-semibold">Pendidikan</h2>
             </div>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PATCH')
+            <div class="space-y-4">
                 @php
                     $pendidikanKeys = ['pendidikan_terakhir','gelar','kampus'];
                     $pendidikanErrors = [];
@@ -354,12 +332,7 @@
                         @error('kampus')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
-                <div class="pt-3">
-                    <button aria-label="Simpan Pendidikan" class="w-full sm:w-auto px-6 py-3 text-base font-semibold rounded-lg shadow-lg border border-sky-800 text-white bg-sky-800 hover:bg-sky-900 focus:outline-none focus:ring-4 focus:ring-sky-500 focus:ring-offset-2" style="background-color:#075985;color:#fff;border-color:#0c4a6e;">
-                        Simpan Pendidikan
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
 
     <div id="keluarga" class="section-anchor scroll-mt-24 bg-white rounded-xl border shadow-sm p-6">
@@ -367,9 +340,7 @@
                 <span class="w-1.5 h-6 rounded bg-gradient-to-b from-amber-500 to-yellow-500"></span>
                 <h2 class="text-lg font-semibold">Keluarga</h2>
             </div>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PATCH')
+            <div class="space-y-4">
                 @php
                     $keluargaKeys = ['nama_ibu_kandung'];
                     $keluargaErrors = [];
@@ -389,15 +360,12 @@
                         @error('nama_ibu_kandung')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
-                <div class="pt-2"><button class="w-full sm:w-auto px-6 py-3 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">Simpan Keluarga</button></div>
-            </form>
+                <div class="pt-2"><!-- unified form single submit button below --></div>
         </div>
 
     <div id="password" class="bg-white rounded-xl border shadow-sm p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Ubah Password</h2>
-            <form action="{{ route('karyawan.settings.update') }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PATCH')
+                <div class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="sm:col-span-1">
                         <label class="block text-sm text-slate-600 mb-1">Password Baru</label>
@@ -409,10 +377,12 @@
                     </div>
                 </div>
                 @error('password')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-        <div class="pt-2">
-            <button class="w-full sm:w-auto px-6 py-3 bg-slate-800 text-white rounded-lg shadow-md hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-600">Update Password</button>
-                </div>
-            </form>
+            </div>
+        </div>
+        <div class="mt-8">
+            <button class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Simpan Semua Perubahan</button>
+        </div>
+        </form>
         </div>
         </div>
     </div>
