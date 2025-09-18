@@ -1,75 +1,103 @@
-# Deploy to Railway
+# 🚀 Panduan Deploy ke Railway
 
-This guide walks you through deploying this Laravel 12 + Breeze app to Railway using the default Nixpacks builder. It includes database setup, environment variables, build, and start commands.
+Panduan lengkap untuk deploy aplikasi Laravel 12 + Breeze ke Railway menggunakan Nixpacks builder. Termasuk setup database, environment variables, build commands, dan start commands.
 
-## Prerequisites
-- Railway account and CLI (optional but recommended)
-- This repository pushed to GitHub (or use Railway GitHub integration)
+## 📋 Prasyarat
+- Akun Railway dan Railway CLI (opsional tapi direkomendasikan)
+- Repository ini sudah di-push ke GitHub (atau gunakan integrasi GitHub Railway)
 
-## One-time setup in Railway
-1. Create a new project and select "Deploy from GitHub repo". Choose this repo.
-2. Railway will auto-detect a service for the app. Keep the default Nixpacks builder.
-3. Add a PostgreSQL or MySQL database service (recommended: PostgreSQL on Railway). Note its connection info.
+## 🏗️ Setup Awal di Railway
+1. Buat project baru dan pilih "Deploy from GitHub repo". Pilih repository ini.
+2. Railway akan otomatis mendeteksi service untuk aplikasi. Gunakan default Nixpacks builder.
+3. Tambahkan service database PostgreSQL atau MySQL (direkomendasikan: PostgreSQL di Railway). Catat informasi koneksinya.
 
-## Environment Variables
-Set these in Railway → Variables for the app service:
+## ⚙️ Environment Variables
+Set variabel berikut di Railway → Variables untuk app service:
 
-Required basics
-- APP_NAME=Perawat
-- APP_ENV=production
-- APP_DEBUG=false
-- APP_URL=https://<your-subdomain>.up.railway.app
-- APP_KEY=base64:... (generate locally with `php artisan key:generate --show` or let the start script generate an ephemeral one; persistent is recommended)
+### Konfigurasi Dasar (Wajib)
+- `APP_NAME=Perawat`
+- `APP_ENV=production`
+- `APP_DEBUG=false`
+- `APP_URL=https://<your-subdomain>.up.railway.app`
+- `APP_KEY=base64:...` (generate lokal dengan `php artisan key:generate --show` atau biarkan start script generate ephemeral key; persistent direkomendasikan)
 
-Database (choose one)
-- For PostgreSQL (Railway managed DB):
-  - DB_CONNECTION=pgsql
-  - DB_HOST=<from Railway DB>
-  - DB_PORT=5432
-  - DB_DATABASE=<from Railway DB>
-  - DB_USERNAME=<from Railway DB>
-  - DB_PASSWORD=<from Railway DB>
-- For MySQL:
-  - DB_CONNECTION=mysql
-  - DB_HOST=<from Railway DB>
-  - DB_PORT=3306
-  - DB_DATABASE=<from Railway DB>
-  - DB_USERNAME=<from Railway DB>
-  - DB_PASSWORD=<from Railway DB>
-  - MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt (optional for managed MySQL)
+### Database (Pilih salah satu)
+**Untuk PostgreSQL (default Railway):**
+- `DB_CONNECTION=pgsql`
+- `DB_HOST=<dari Railway DB>`
+- `DB_PORT=5432`
+- `DB_DATABASE=<dari Railway DB>`
+- `DB_USERNAME=<dari Railway DB>`
+- `DB_PASSWORD=<dari Railway DB>`
 
-Cache/Queue (defaults are fine)
-- CACHE_DRIVER=file (or redis if you add Redis)
-- SESSION_DRIVER=file
-- QUEUE_CONNECTION=database (or sync)
+**Untuk MySQL:**
+- `DB_CONNECTION=mysql`
+- `DB_HOST=<dari Railway DB>`
+- `DB_PORT=3306`
+- `DB_DATABASE=<dari Railway DB>`
+- `DB_USERNAME=<dari Railway DB>`
+- `DB_PASSWORD=<dari Railway DB>`
+- `MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt` (opsional untuk managed MySQL)
 
-Mail (if you want real emails in production)
-- MAIL_MAILER=smtp
-- MAIL_HOST=smtp.gmail.com
-- MAIL_PORT=587
-- MAIL_USERNAME=<your@gmail.com>
-- MAIL_PASSWORD=<your app password>
-- MAIL_ENCRYPTION=tls
-- MAIL_FROM_ADDRESS=<your@gmail.com>
-- MAIL_FROM_NAME="Reset Password"
+### Cache/Queue (default sudah baik)
+- `CACHE_DRIVER=file` (atau redis jika menambahkan Redis)
+- `SESSION_DRIVER=file`
+- `QUEUE_CONNECTION=database` (atau sync)
 
-## Build & Start Commands
-Railway Nixpacks will detect PHP and Node from composer.json and package.json.
+### Email (jika ingin email real di production)
+- `MAIL_MAILER=smtp`
+- `MAIL_HOST=smtp.gmail.com`
+- `MAIL_PORT=587`
+- `MAIL_USERNAME=<your@gmail.com>`
+- `MAIL_PASSWORD=<your app password>`
+- `MAIL_ENCRYPTION=tls`
+- `MAIL_FROM_ADDRESS=<your@gmail.com>`
+- `MAIL_FROM_NAME="Reset Password"`
 
-Build command (Railway → Settings → Build)
-- composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
-- npm ci --no-audit --no-fund
-- npm run build
+### PHP/Nixpacks
+- `NIXPACKS_PHP_ROOT_DIR=/app/public`
 
-Start command (Railway → Settings → Start)
-- bash scripts/start-railway.sh (or rely on `Procfile` which already defines `web`)
+## 🔨 Build & Start Commands
+Railway Nixpacks akan mendeteksi PHP dan Node dari composer.json dan package.json.
 
-The start script will:
-- Ensure APP_KEY exists (generates ephemeral if missing)
-- Run storage:link, optimize:clear
-- Run migrate --force (and optionally seed when SEED_ON_BOOT=true)
+### Build command (Railway → Settings → Build)
+- `composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader`
+- `npm ci --no-audit --no-fund`
+- `npm run build`
+
+### Start command (Railway → Settings → Start)
+- `bash scripts/start-railway.sh` (atau andalkan `Procfile` yang sudah mendefinisikan `web`)
+
+Start script akan:
+- Memastikan APP_KEY ada (generate ephemeral jika hilang)
+- Menjalankan storage:link, optimize:clear
+- Menjalankan migrate --force (dan opsional seed ketika SEED_ON_BOOT=true)
 - Cache config/routes/views/events
-- Start the Laravel server bound to 0.0.0.0:$PORT
+- Start Laravel server yang bind ke 0.0.0.0:$PORT
+
+## 🎨 Assets (Vite)
+`npm run build` menghasilkan production assets yang dikonsumsi oleh `laravel-vite-plugin`. Pastikan APP_URL di-set dengan benar agar asset URLs dapat resolve.
+Juga set `NIXPACKS_PHP_ROOT_DIR=/app/public` di Railway Variables agar Nixpacks serve dari direktori `public/`.
+
+## 💾 File Storage
+- Aplikasi menggunakan `storage/app` dan `public/storage`. Filesystem Railway bersifat ephemeral. Untuk upload persisten, gunakan cloud disk (S3, dll) dan set FILESYSTEM_DISK=s3 dengan kredensial yang sesuai. Untuk demo cepat, local storage sudah cukup tapi akan reset saat redeploy.
+
+## ❤️ Health Check
+- Opsional: Konfigurasi healthcheck ke `GET /` di Railway. Pastikan routes Anda return 200.
+
+## 🔧 Troubleshooting
+- **500 errors setelah deploy**: cek logs. Masalah umum adalah APP_KEY hilang atau kredensial DB salah.
+- **"could not find driver" (PDO)**: pastikan driver extension DB ter-install. Nixpacks PHP provider auto-install driver umum. Jika masih ada masalah, double-check DB_CONNECTION.
+- **Asset 404s**: verifikasi `npm run build` berjalan dan `APP_URL` di-set.
+- **Migrations stuck**: pastikan variabel DB di-set pada app service (bukan hanya pada DB service).
+- **Email tidak terkirim**: verifikasi variabel SMTP dan provider mengizinkan outbound SMTP.
+
+## 🌐 Custom Domain (Opsional)
+- Tambahkan domain di Railway, set APP_URL ke https://yourdomain dan update OAuth redirects jika applicable.
+
+---
+
+🎉 **Selamat deploy!** Jika perlu, kita juga bisa membuat GitHub Actions workflow minimal untuk deploy on push ke `main` via Railway CLI.
 
 ## Assets (Vite)
 `npm run build` produces production assets consumed by `laravel-vite-plugin`. Ensure APP_URL is set correctly so asset URLs resolve.
