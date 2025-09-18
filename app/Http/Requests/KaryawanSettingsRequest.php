@@ -22,7 +22,7 @@ class KaryawanSettingsRequest extends FormRequest
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
             'foto_profil' => 'sometimes|image|max:2048',
-            'password' => 'nullable|confirmed|min:8',
+            'password' => 'nullable|confirmed|min:6|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/',
             'nik' => 'nullable|string|max:16|unique:karyawan,nik,' . $karyawanId,
             'nip' => 'nullable|string|max:30|unique:karyawan,nip,' . $karyawanId,
             'status_pegawai_id' => 'nullable|exists:status_pegawai,id',
@@ -48,6 +48,15 @@ class KaryawanSettingsRequest extends FormRequest
         ];
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.regex' => 'Password harus mengandung minimal 1 huruf kecil, 1 huruf besar, dan 1 angka.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ];
     }
 
     public function withValidator($validator)

@@ -28,6 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = auth()->user();
+        
+        // Cek status karyawan yang belum di-approve admin
+        if ($user->role === 'karyawan' && $user->status === 'pending') {
+            // Logout user yang belum di-approve
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('registration.success')
+                ->with('info', 'Akun Anda masih menunggu persetujuan admin. Silakan tunggu email konfirmasi.');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

@@ -21,3 +21,8 @@
 	 -->
 
 - [x] Ensure Documentation is Complete - README.md updated with comprehensive project documentation
+
+- [x] "Create a page with Tailwind CSS.
+	Use a full-width layout on desktop (no empty space on the left and right).
+	Do not use the container class that limits max-width; use w-full instead.
+	Add left-right padding px-6 so the content doesn't stick to the edges of the screen."

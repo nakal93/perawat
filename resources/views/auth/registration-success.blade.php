@@ -113,6 +113,29 @@
                     <div class="h-1 w-20 bg-emerald-400 mx-auto rounded-full mb-6"></div>
                 </div>
 
+                <!-- Flash Messages -->
+                @if (session('info'))
+                    <div class="mb-6 bg-blue-500/20 border border-blue-400/30 rounded-xl p-4">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="text-blue-100">{{ session('info') }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                @if (session('warning'))
+                    <div class="mb-6 bg-yellow-500/20 border border-yellow-400/30 rounded-xl p-4">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-yellow-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                            <p class="text-yellow-100">{{ session('warning') }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Success Message -->
                 <div class="text-center space-y-6 mb-8">
                     <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-xl p-6">

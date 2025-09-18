@@ -100,7 +100,8 @@ Route::middleware(['auth', 'profile.completed'])->group(function () {
             ->parameters(['status-pegawai' => 'statusPegawai']);
         
         // Document management routes
-        Route::resource('dokumen', \App\Http\Controllers\Admin\DokumenController::class);
+        Route::resource('dokumen', \App\Http\Controllers\Admin\DokumenController::class)
+            ->parameters(['dokumen' => 'dokumen']);
         Route::get('dokumen/{dokumen}/download', [\App\Http\Controllers\Admin\DokumenController::class, 'download'])->name('dokumen.download');
     });
 

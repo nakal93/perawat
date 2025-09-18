@@ -33,8 +33,11 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
-            // Password: min 6, at least one uppercase and one number
-            'password' => ['required', 'confirmed', 'min:6', 'regex:/^(?=.*[A-Z])(?=.*\d).+$/'],
+            'password' => ['required', 'confirmed', 'min:6', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/'],
+        ], [
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.regex' => 'Password harus mengandung minimal 1 huruf kecil, 1 huruf besar, dan 1 angka.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
