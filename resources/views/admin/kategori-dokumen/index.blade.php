@@ -3,7 +3,7 @@
 @section('breadcrumb', 'Kategori Dokumen')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">

@@ -1,0 +1,22 @@
+# Konfigurasi Railway untuk deploy langsung dari lokal (tanpa integrasi GitHub)
+# Jalankan deployment dengan: railway up
+
+[build]
+# Railway (Nixpacks) otomatis mendeteksi PHP + Node; override jika perlu
+# builder = "NIXPACKS"  # default
+
+[deploy]
+# Command utama akan menggunakan Procfile => web: ...
+# Atau bisa override di sini (biarkan kosong agar pakai Procfile)
+restartPolicy = "ON_FAILURE"
+
+[env]
+APP_ENV = "production"
+APP_DEBUG = "false"
+# APP_KEY dikosongkan agar script generate jika tidak diset manual
+
+# Feature flags
+SEED_ON_BOOT = "false"
+RUN_QUEUE = "false"
+
+# Tambahkan environment lain via dashboard atau file .env.railway.example sebagai referensi

@@ -44,6 +44,12 @@ if [ "${SEED_ON_BOOT:-false}" = "true" ]; then
   php artisan db:seed --force --no-interaction || true
 fi
 
+# Optional: start queue worker in background if RUN_QUEUE=true
+if [ "${RUN_QUEUE:-false}" = "true" ]; then
+  echo "[start-railway] Starting queue worker in background (RUN_QUEUE=true)"
+  php artisan queue:work --tries=3 --timeout=90 &
+fi
+
 echo "[start-railway] Building caches"
 php artisan config:cache
 php artisan route:cache || true

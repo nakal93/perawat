@@ -3,7 +3,7 @@
 @section('breadcrumb', 'Profesi')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Manajemen Profesi</h1>

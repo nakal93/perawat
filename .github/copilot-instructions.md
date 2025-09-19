@@ -26,3 +26,17 @@
 	Use a full-width layout on desktop (no empty space on the left and right).
 	Do not use the container class that limits max-width; use w-full instead.
 	Add left-right padding px-6 so the content doesn't stick to the edges of the screen."
+
+- [x] "Create a responsive navigation bar with Tailwind CSS.
+	On mobile, use a hamburger menu that toggles the visibility of the navigation links.
+	On desktop, display the navigation links horizontally."
+- [x] "Create a responsive form with Tailwind CSS.
+
+
+
+
+php artisan serve --host=0.0.0.0 --port=8000
+# atau jika menggunakan Laravel Sail
+./vendor/bin/sail up
+```
+	Ensure the form looks good on both mobile and desktop devices.	

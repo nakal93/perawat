@@ -379,7 +379,7 @@
                     @endif
 
                     <!-- Main content area -->
-                    <main class="@hasSection('breadcrumb') pt-0 @else pt-6 @endif px-4 sm:px-6 lg:px-8 pb-6">
+                    <main class="@hasSection('breadcrumb') pt-0 @else pt-6 @endif w-full px-6 pb-6">
                         @yield('content')
                     </main>
                 </div>
@@ -568,7 +568,7 @@
                     </div>
 
                     <!-- Main content area -->
-                    <main class="pt-6 px-4 sm:px-6 lg:px-8 pb-6">
+                    <main class="pt-6 w-full px-6 pb-6">
                         @yield('content')
                     </main>
                 </div>

@@ -3,7 +3,7 @@
 @section('breadcrumb', 'Dokumen')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
@@ -33,7 +33,7 @@
         @endphp
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div class="bg-white rounded-lg shadow p-6">
+            <a href="{{ route('admin.dokumen.index') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 block">
                 <div class="flex items-center">
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
                         <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,9 +45,9 @@
                         <div class="text-gray-600">Total Dokumen</div>
                     </div>
                 </div>
-            </div>
+            </a>
             
-            <div class="bg-white rounded-lg shadow p-6">
+            <a href="{{ route('admin.dokumen.index', ['status' => 'active']) }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 block">
                 <div class="flex items-center">
                     <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
                         <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,9 +59,9 @@
                         <div class="text-gray-600">Dokumen Aktif</div>
                     </div>
                 </div>
-            </div>
+            </a>
             
-            <div class="bg-white rounded-lg shadow p-6">
+            <a href="{{ route('admin.dokumen.index', ['status' => 'expiring']) }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 block">
                 <div class="flex items-center">
                     <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
                         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,9 +73,9 @@
                         <div class="text-gray-600">Akan Berakhir</div>
                     </div>
                 </div>
-            </div>
+            </a>
             
-            <div class="bg-white rounded-lg shadow p-6">
+            <a href="{{ route('admin.dokumen.index', ['status' => 'expired']) }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200 block">
                 <div class="flex items-center">
                     <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
                         <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@
                         <div class="text-gray-600">Sudah Berakhir</div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Filters -->
@@ -110,7 +110,7 @@
                         <option value="">Semua Kategori</option>
                         @foreach($kategori as $kat)
                             <option value="{{ $kat->id }}" {{ request('kategori') == $kat->id ? 'selected' : '' }}>
-                                {{ $kat->nama }}
+                                {{ $kat->nama_kategori }}
                             </option>
                         @endforeach
                     </select>
@@ -174,7 +174,7 @@
                                     </div>
                                     <p class="text-gray-600 mb-2">
                                         <strong>{{ $doc->karyawan->user->name ?? 'N/A' }}</strong> - 
-                                        {{ $doc->kategoriDokumen->nama ?? 'N/A' }}
+                                        {{ $doc->kategoriDokumen->nama_kategori ?? 'N/A' }}
                                     </p>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-500">
                                         <div>

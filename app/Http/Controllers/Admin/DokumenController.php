@@ -101,7 +101,7 @@ class DokumenController extends Controller
     public function edit(DokumenKaryawan $dokumen)
     {
         $dokumen->load(['karyawan.user', 'kategoriDokumen']);
-        $kategori = KategoriDokumen::orderBy('nama')->get();
+        $kategori = KategoriDokumen::orderBy('nama_kategori')->get();
         $karyawan = Karyawan::with('user')->orderBy('id')->get();
         
         return view('admin.dokumen.edit', compact('dokumen', 'kategori', 'karyawan'));

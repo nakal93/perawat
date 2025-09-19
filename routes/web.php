@@ -8,8 +8,10 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RuanganController;
 use App\Http\Controllers\Admin\ProfesiController;
 use App\Http\Controllers\Admin\KategoriDokumenController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Admin\KaryawanController as AdminKaryawanController;
+use App\Http\Controllers\Admin\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -76,8 +78,12 @@ Route::middleware(['auth', 'profile.completed'])->group(function () {
         Route::get('/karyawan', [AdminKaryawanController::class, 'index'])->name('karyawan.index');
         Route::get('/karyawan/{karyawan}', [AdminKaryawanController::class, 'show'])->name('karyawan.show');
         Route::get('/karyawan/create', [\App\Http\Controllers\KaryawanController::class, 'adminCreate'])->name('karyawan.create');
-        Route::get('/laporan', function() { return view('admin.laporan'); })->name('laporan');
-        Route::get('/settings', function() { return view('admin.settings'); })->name('settings');
+        Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
+        Route::get('/laporan/export-csv', [LaporanController::class, 'exportCsv'])->name('laporan.export-csv');
+        Route::get('/laporan/print', [LaporanController::class, 'print'])->name('laporan.print');
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+        Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('/settings/system-info', [SettingsController::class, 'systemInfo'])->name('settings.system-info');
         
         // Approval routes
         Route::prefix('approval')->name('approval.')->group(function () {

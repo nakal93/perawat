@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="max-w-2xl mx-auto">
+    <div class="w-full max-w-4xl mx-auto">
         <div class="flex items-center mb-6">
             <a href="{{ route('admin.kategori-dokumen.index') }}" 
                class="mr-4 text-gray-600 hover:text-gray-900">
