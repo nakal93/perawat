@@ -12,6 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust proxy headers for HTTPS and proxy setup
+        $middleware->trustProxies(at: [
+            '10.10.10.9',    // Nginx Proxy Manager IP
+            '127.0.0.1',     // Localhost
+            '10.10.10.0/24', // Local network range
+        ]);
+        
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'profile.completed' => \App\Http\Middleware\EnsureProfileCompleted::class,
