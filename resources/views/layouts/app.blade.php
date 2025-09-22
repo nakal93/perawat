@@ -701,30 +701,30 @@
         <!-- Global PDF Viewer (pdf.js) - Professional Style -->
     <div id="globalPdfModal" class="fixed inset-0 bg-gray-900 z-[11000] hidden" role="dialog" aria-modal="true" aria-label="Pratinjau Dokumen PDF">
             <div class="absolute inset-0 flex flex-col">
-                <!-- Enhanced Toolbar -->
-                <div class="bg-gray-800 text-white px-4 py-2 flex items-center justify-between border-b border-gray-700">
-                    <div class="flex items-center gap-3">
+                <!-- Enhanced Toolbar - Mobile Responsive -->
+                <div class="bg-gray-800 text-white px-2 sm:px-4 py-2 flex items-center justify-between border-b border-gray-700">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <button id="pdfCloseBtn" class="w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center text-white">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
-                        <button id="pdfToggleSidebar" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center text-white">
+                        <button id="pdfToggleSidebar" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center text-white hidden sm:flex">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
                         </button>
-                        <span id="pdfFileName" class="text-sm text-gray-300 truncate max-w-xs"></span>
+                        <span id="pdfFileName" class="text-xs sm:text-sm text-gray-300 truncate max-w-[120px] sm:max-w-xs"></span>
                     </div>
                     
-                    <!-- Central Navigation & Zoom Controls -->
-                    <div class="flex items-center gap-2">
+                    <!-- Central Navigation & Zoom Controls - Mobile Optimized -->
+                    <div class="flex items-center gap-1 sm:gap-2">
                         <button id="pdfPrevBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Previous Page">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
                         </button>
-                        <div class="bg-gray-700 px-3 py-1 rounded text-sm">
+                        <div class="bg-gray-700 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">
                             <span id="pdfPageNum">1</span> / <span id="pdfPageCount">1</span>
                         </div>
                         <button id="pdfNextBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Next Page">
@@ -733,14 +733,14 @@
                             </svg>
                         </button>
                         
-                        <div class="w-px h-6 bg-gray-600 mx-2"></div>
+                        <div class="w-px h-6 bg-gray-600 mx-1 sm:mx-2"></div>
                         
                         <button id="pdfZoomOutBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Zoom Out">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
                             </svg>
                         </button>
-                        <div class="bg-gray-700 px-2 py-1 rounded text-sm min-w-[60px] text-center">
+                        <div class="bg-gray-700 px-2 py-1 rounded text-xs sm:text-sm min-w-[50px] sm:min-w-[60px] text-center">
                             <span id="pdfZoomLabel">100%</span>
                         </div>
                         <button id="pdfZoomInBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Zoom In">
@@ -750,28 +750,30 @@
                         </button>
                     </div>
 
-                    <!-- Right Controls -->
-                    <div class="flex items-center gap-2">
-                        <button id="pdfRotateLeftBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Rotate Left">
+                    <!-- Right Controls - Mobile Responsive -->
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <!-- Hide rotation on small screens -->
+                        <button id="pdfRotateLeftBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center hidden sm:flex" title="Rotate Left">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72 1.02-2.47zM6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47zm1.01 5.32c1.16.9 2.51 1.44 3.9 1.61V17.9c-.87-.15-1.71-.49-2.46-1.03L7.1 18.32zM13 4.07V1L8.45 5.55 13 10V6.09c2.84.48 5 2.94 5 5.91s-2.16 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93s-3.05-7.44-7-7.93z"/>
                             </svg>
                         </button>
-                        <button id="pdfRotateRightBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Rotate Right">
+                        <button id="pdfRotateRightBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center hidden sm:flex" title="Rotate Right">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M15.55 5.55L11 1v3.07C7.06 4.56 4 7.92 4 12s3.05 7.44 7 7.93v-2.02c-2.84-.48-5-2.94-5-5.91s2.16-5.43 5-5.91V10l4.55-4.45zM19.93 11c-.17-1.39-.72-2.73-1.62-3.89l-1.42 1.42c.54.75.88 1.6 1.02 2.47h2.02zM13 17.9v2.02c1.39-.17 2.74-.71 3.9-1.61l-1.44-1.44c-.75.54-1.59.89-2.46 1.03zm3.89-2.42l1.42 1.41c.9-1.16 1.45-2.5 1.62-3.89h-2.02c-.14.87-.48 1.72-1.02 2.48z"/>
                             </svg>
                         </button>
                         
-                        <div class="w-px h-6 bg-gray-600 mx-1"></div>
+                        <div class="w-px h-6 bg-gray-600 mx-1 hidden sm:block"></div>
                         
-                        <button id="pdfFitWidthBtn" class="px-3 py-1 rounded hover:bg-gray-700 text-sm" title="Fit Width">
-                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Show fit width by default on mobile -->
+                        <button id="pdfFitWidthBtn" class="px-2 sm:px-3 py-1 rounded hover:bg-gray-700 text-xs sm:text-sm" title="Fit Width">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V3a1 1 0 011 1v10a1 1 0 01-1 1H8a1 1 0 01-1-1V4z"/>
                             </svg>
-                            Width
+                            <span class="hidden sm:inline">Width</span>
                         </button>
-                        <button id="pdfFitPageBtn" class="px-3 py-1 rounded hover:bg-gray-700 text-sm" title="Fit Page">
+                        <button id="pdfFitPageBtn" class="px-2 sm:px-3 py-1 rounded hover:bg-gray-700 text-xs sm:text-sm hidden sm:block" title="Fit Page">
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -780,17 +782,17 @@
                         
                         <div class="w-px h-6 bg-gray-600 mx-1"></div>
                         
-                        <button id="pdfFullscreenBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Fullscreen">
+                        <button id="pdfFullscreenBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center hidden sm:flex" title="Fullscreen">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                             </svg>
                         </button>
                         <a id="pdfDownloadBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Download" target="_blank">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </a>
-                        <button id="pdfPrintBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center" title="Print">
+                        <button id="pdfPrintBtn" class="w-8 h-8 rounded hover:bg-gray-700 flex items-center justify-center hidden sm:flex" title="Print">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                             </svg>
@@ -1093,24 +1095,42 @@
                     downloadBtn.href = fileUrl;
                     downloadBtn.setAttribute('download', title || 'document.pdf');
                     
-                    // Show sidebar by default
-                    sidebar.classList.remove('hidden');
+                    // Mobile responsive: hide sidebar on small screens
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('hidden');
+                        fitMode = 'width'; // Auto fit width on mobile
+                    } else {
+                        sidebar.classList.remove('hidden');
+                    }
                     
                     pdfjsLib.getDocument(fileUrl).promise.then(function(doc) {
                         pdfDoc = doc;
                         pageCountEl.textContent = doc.numPages;
                         renderPage(pageNum);
-                        buildThumbnails();
+                        if (window.innerWidth >= 768) {
+                            buildThumbnails();
+                        }
                     }).catch(function(err) {
                         console.error('PDF load error:', err);
                         alert('Gagal memuat PDF. Pastikan file dapat diakses.');
                     });
                 };
 
-                // Responsive: re-fit on resize when fit mode active
+                // Responsive: re-fit on resize when fit mode active + handle sidebar
                 window.addEventListener('resize', () => { 
                     if (pdfDoc && fitMode !== 'none') {
                         queueRenderPage(pageNum);
+                    }
+                    
+                    // Mobile responsive sidebar handling
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('hidden');
+                    } else if (!modal.classList.contains('hidden') && sidebar.classList.contains('hidden')) {
+                        // Only show sidebar on desktop if modal is open
+                        sidebar.classList.remove('hidden');
+                        if (pdfDoc && sidebar.querySelector('#pdfThumbnails').children.length === 0) {
+                            buildThumbnails();
+                        }
                     }
                 });
 

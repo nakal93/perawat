@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+<div class="w-full py-6">
     @if(request()->boolean('debug'))
     @php
         $user = auth()->user();
@@ -74,23 +74,29 @@
                             </div>
                         </div>
                     @else
-                        <div class="w-full h-32 bg-gray-50 border border-dashed rounded-md mb-3 flex items-center justify-center text-gray-500 group">
+                        <div class="w-full mb-3">
                             @if($isPdf)
-                                <button onclick="openPdfViewer('{{ $fileRel }}', '{{ addslashes($d->file_name) }}')" 
-                                    class="flex flex-col items-center gap-2 px-4 py-3 rounded-md border border-red-200 hover:border-red-400 hover:bg-red-50 transition-all group-hover:scale-105">
-                                    <svg class="w-8 h-8 text-red-600" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8.267 14.68c-.184 0-.308.018-.372.036v1.178c.076.018.171.023.302.023.479 0 .774-.242.774-.651 0-.366-.254-.586-.704-.586zm3.487.012c-.2 0-.33.018-.407.036v2.61c.077.018.201.018.313.018.817.006 1.349-.444 1.349-1.396.006-.83-.479-1.268-1.255-1.268z"/>
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                                        <path fill="#fff" d="M9.498 16.19c-.309 0-.482-.219-.482-.609 0-.388.173-.607.482-.607.309 0 .482.219.482.607 0 .39-.173.609-.482.609zM12 14.615v-2.704h-.78v2.13h-.012c-.16-.295-.394-.406-.646-.406-.451 0-.884.357-.884 1.065 0 .705.433 1.065.884 1.065.265 0 .497-.125.659-.436h.013v.376H12z"/>
-                                    </svg>
-                                    <span class="text-sm font-medium text-red-700 group-hover:text-red-800">Preview PDF</span>
-                                </button>
+                                <!-- Inline PDF preview seperti di halaman admin detail -->
+                                <div class="relative w-full h-40 sm:h-56 border rounded-md overflow-hidden bg-white">
+                                    <iframe src="{{ $fileRel }}" class="w-full h-full" frameborder="0" loading="lazy"></iframe>
+                                    <button type="button" onclick="openPdfViewer('{{ $fileRel }}', '{{ addslashes($d->file_name) }}')"
+                                            class="absolute bottom-2 right-2 inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-red-600 text-white hover:bg-red-700 shadow">
+                                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        Perbesar
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Preview PDF - <a href="{{ $fileRel }}" target="_blank" class="text-blue-600 hover:underline">Buka di tab baru</a></p>
                             @else
-                                <div class="flex flex-col items-center gap-2">
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    <span class="text-sm uppercase font-medium">{{ $ext }}</span>
+                                <div class="w-full h-32 bg-gray-50 border border-dashed rounded-md flex items-center justify-center text-gray-500">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <span class="text-sm uppercase font-medium">{{ $ext }}</span>
+                                    </div>
                                 </div>
                             @endif
                         </div>

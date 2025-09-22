@@ -6,14 +6,14 @@
 <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div class="w-full">
             <div class="flex justify-between items-center h-14 sm:h-16">
                 <h1 class="text-lg sm:text-xl font-semibold text-gray-900">Pengaturan Profil</h1>
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 lg:py-8">
+    <div class="w-full py-4 lg:py-8">
         <div class="lg:grid lg:grid-cols-12 lg:gap-6">
             <!-- Settings menu - Desktop -->
             <aside class="hidden lg:block lg:col-span-3">

@@ -3,7 +3,7 @@
 @section('breadcrumb', 'Beranda')
 
 @section('content')
-<div class="w-full px-4 sm:px-6 lg:px-8">
+<div class="w-full">
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <a href="{{ route('dokumen.index') }}" class="group relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl border border-blue-200 shadow-sm p-6 hover:shadow-md transition-all duration-200">
