@@ -8,9 +8,18 @@
 APP_DIR="/var/www/perawat"
 BACKUP_DIR="/var/www/backups"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-DB_NAME="perawat_db"
-DB_USER="perawat_user"
-DB_PASS="perawat_2024"
+
+# Read database config from .env file
+if [ -f "$APP_DIR/.env" ]; then
+    DB_NAME=$(grep "^DB_DATABASE=" "$APP_DIR/.env" | cut -d '=' -f2)
+    DB_USER=$(grep "^DB_USERNAME=" "$APP_DIR/.env" | cut -d '=' -f2)
+    DB_PASS=$(grep "^DB_PASSWORD=" "$APP_DIR/.env" | cut -d '=' -f2)
+else
+    # Fallback values
+    DB_NAME="perawat_db"
+    DB_USER="perawat_user"
+    DB_PASS="perawat_password"
+fi
 
 # Colors for output
 RED='\033[0;31m'
