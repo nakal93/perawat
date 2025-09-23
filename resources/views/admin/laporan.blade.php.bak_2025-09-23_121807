@@ -327,20 +327,6 @@
                                 </svg>
                                 Unduh CSV
                             </a>
-                            <a href="{{ route('admin.laporan.export-excel', request()->query()) }}" 
-                               class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
-                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 16l-4-4m0 0l-4 4m4-4v12" />
-                                </svg>
-                                Unduh Excel
-                            </a>
-                            <a href="{{ route('admin.laporan.export-pdf', request()->query()) }}" 
-                               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
-                                </svg>
-                                Unduh PDF
-                            </a>
                             
                             <a href="{{ route('admin.laporan.print', request()->query()) }}" 
                                target="_blank"
@@ -607,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const ruanganLabels = ruanganData.map(item => item.nama);
         const ruanganValues = ruanganData.map(item => item.jumlah);
         const ruanganHasData = ruanganValues.some(v => v > 0);
-        const ruanganChart = new Chart(ruanganCtx, {
+        new Chart(ruanganCtx, {
             type: 'doughnut',
             data: {
                 labels: ruanganLabels.length ? ruanganLabels : ['Tidak ada data'],
@@ -635,22 +621,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-
-        // Click to filter ruangan
-        ruanganCanvas.onclick = (evt) => {
-            const points = ruanganChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-            if (!points.length) return;
-            const idx = points[0].index;
-            const label = ruanganLabels[idx];
-            // Find ruangan id from label by matching in embedded data
-            const match = (window.ruanganLookup || []).find(r => r.nama === label);
-            if (match && match.id) {
-                const url = new URL(window.location.href);
-                url.searchParams.set('ruangan_id', match.id);
-                url.searchParams.set('page', '1');
-                window.location.href = url.toString();
-            }
-        };
 
         // Legend untuk ruangan chart
         const ruanganLegend = document.getElementById('ruanganLegend');
@@ -683,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const statusCtx = statusCanvas.getContext('2d');
         const diriValues = statusDataDiri.map(item => item.value);
         const diriHasData = diriValues.some(v => v > 0);
-        const statusChart = new Chart(statusCtx, {
+        new Chart(statusCtx, {
             type: 'doughnut',
             data: {
                 labels: statusDataDiri.map(item => item.label),
@@ -731,21 +701,6 @@ document.addEventListener('DOMContentLoaded', function() {
             legendItem.innerHTML = '<span>Tidak ada data</span>';
             statusLegend.appendChild(legendItem);
         }
-
-        // Click to filter status_kelengkapan
-        statusCanvas.onclick = (evt) => {
-            const points = statusChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-            if (!points.length) return;
-            const idx = points[0].index;
-            const label = statusDataDiri[idx].label || '';
-            const map = { 'Lengkap': 'lengkap', 'Belum Lengkap': 'belum_lengkap' };
-            const value = map[label];
-            if (!value) return;
-            const url = new URL(window.location.href);
-            url.searchParams.set('status_kelengkapan', value);
-            url.searchParams.set('page', '1');
-            window.location.href = url.toString();
-        };
     }
 
     // Chart 3: Status Kelengkapan Dokumen (Doughnut Chart)
@@ -754,7 +709,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const dokumenCtx = dokumenCanvas.getContext('2d');
         const dokValues = statusDataDokumen.map(item => item.value);
         const dokHasData = dokValues.some(v => v > 0);
-        const dokumenChart = new Chart(dokumenCtx, {
+        new Chart(dokumenCtx, {
             type: 'doughnut',
             data: {
                 labels: statusDataDokumen.map(item => item.label),
@@ -802,21 +757,6 @@ document.addEventListener('DOMContentLoaded', function() {
             legendItem.innerHTML = '<span>Tidak ada data</span>';
             dokumenLegend.appendChild(legendItem);
         }
-
-        // Click to filter dokumen wajib
-        dokumenCanvas.onclick = (evt) => {
-            const points = dokumenChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-            if (!points.length) return;
-            const idx = points[0].index;
-            const label = statusDataDokumen[idx].label || '';
-            const map = { 'Lengkap': 'dokumen_lengkap', 'Belum Lengkap': 'dokumen_belum_lengkap' };
-            const value = map[label];
-            if (!value) return;
-            const url = new URL(window.location.href);
-            url.searchParams.set('status_kelengkapan', value);
-            url.searchParams.set('page', '1');
-            window.location.href = url.toString();
-        };
     }
 
     // Chart 4: Distribusi Profesi (Horizontal Bar Chart)
@@ -825,7 +765,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const profesiCtx = profesiCanvas.getContext('2d');
     const profesiValues = profesiData.map(item => item.jumlah);
     const profesiLabels = profesiData.map(item => (item.nama || '').length > 18 ? (item.nama.substring(0, 17) + '…') : item.nama);
-        const profesiChart = new Chart(profesiCtx, {
+        new Chart(profesiCtx, {
             type: 'bar',
             data: {
                 labels: profesiLabels.length ? profesiLabels : ['Tidak ada data'],
@@ -856,21 +796,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-
-        // Click to filter profesi
-        profesiCanvas.onclick = (evt) => {
-            const points = profesiChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-            if (!points.length) return;
-            const idx = points[0].index;
-            const label = (profesiData[idx] || {}).nama;
-            const match = (window.profesiLookup || []).find(p => p.nama === label);
-            if (match && match.id) {
-                const url = new URL(window.location.href);
-                url.searchParams.set('profesi_id', match.id);
-                url.searchParams.set('page', '1');
-                window.location.href = url.toString();
-            }
-        };
     }
 
     // Chart 5: Trend Karyawan Bergabung (Line Chart)
@@ -920,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const genderCtx = genderCanvas.getContext('2d');
         const genderValues = genderData.map(item => item.value);
         const genderHasData = genderValues.some(v => v > 0);
-        const genderChart = new Chart(genderCtx, {
+        new Chart(genderCtx, {
             type: 'doughnut',
             data: {
                 labels: genderData.map(item => item.label),
@@ -968,25 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
             legendItem.innerHTML = '<span>Tidak ada data</span>';
             genderLegend.appendChild(legendItem);
         }
-
-        // Click to filter jenis_kelamin
-        genderCanvas.onclick = (evt) => {
-            const points = genderChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-            if (!points.length) return;
-            const idx = points[0].index;
-            const label = genderData[idx].label;
-            const map = { 'Laki-Laki': 'Laki-laki', 'Perempuan': 'Perempuan' };
-            const value = map[label] || label;
-            const url = new URL(window.location.href);
-            url.searchParams.set('jenis_kelamin', value);
-            url.searchParams.set('page', '1');
-            window.location.href = url.toString();
-        };
     }
-
-    // Provide id lookups for ruangan/profesi to enable click->filter
-    window.ruanganLookup = @json($ruangan->map(fn($r) => ['id' => $r->id, 'nama' => $r->nama_ruangan])->values());
-    window.profesiLookup = @json($profesi->map(fn($p) => ['id' => $p->id, 'nama' => $p->nama_profesi])->values());
 
     console.log('Charts initialized successfully');
 });

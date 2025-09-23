@@ -80,6 +80,8 @@ Route::middleware(['auth', 'profile.completed'])->group(function () {
         Route::get('/karyawan/create', [\App\Http\Controllers\KaryawanController::class, 'adminCreate'])->name('karyawan.create');
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
         Route::get('/laporan/export-csv', [LaporanController::class, 'exportCsv'])->name('laporan.export-csv');
+    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
         Route::get('/laporan/print', [LaporanController::class, 'print'])->name('laporan.print');
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
         Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');

@@ -6,12 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\KaryawanExport;
 
 class LaporanController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Apply all supported filters to the base query
+     */
+    private function applyFilters(Request $request, Builder $query): Builder
     {
-        $query = Karyawan::with([
+        // Relasi umum
+        $query->with([
             'user',
             'ruangan',
             'profesi',
@@ -20,22 +27,21 @@ class LaporanController extends Controller
             'kabupaten',
             'kecamatan',
             'kelurahan',
-            'dokumen.kategoriDokumen'
+            'dokumen.kategoriDokumen',
         ])->withCount('dokumen');
-        
-        // Filter berdasarkan input
+
+        // Filter sederhana
         if ($request->filled('ruangan_id')) {
             $query->where('ruangan_id', $request->ruangan_id);
         }
-        
         if ($request->filled('profesi_id')) {
             $query->where('profesi_id', $request->profesi_id);
         }
-        
         if ($request->filled('status_pegawai_id')) {
             $query->where('status_pegawai_id', $request->status_pegawai_id);
         }
-        
+
+        // Pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -59,32 +65,45 @@ class LaporanController extends Controller
         if ($request->filled('tanggal_masuk_to')) {
             $query->whereDate('tanggal_masuk_kerja', '<=', $request->tanggal_masuk_to);
         }
-        
-        // Filter status kelengkapan
+
+        // Status kelengkapan
         if ($request->filled('status_kelengkapan')) {
             $statusFilter = $request->status_kelengkapan;
-            
             if ($statusFilter === 'lengkap') {
                 $query->where('status_kelengkapan', 'lengkap');
             } elseif ($statusFilter === 'belum_lengkap') {
-                $query->where('status_kelengkapan', '!=', 'lengkap');
-            } elseif ($statusFilter === 'dokumen_lengkap') {
-                // Filter karyawan yang dokumen wajibnya lengkap
-                $kategoriWajib = \App\Models\KategoriDokumen::where('wajib', true)->pluck('id');
-                $query->whereHas('dokumen', function($q) use ($kategoriWajib) {
-                    $q->whereIn('kategori_dokumen_id', $kategoriWajib)
-                      ->havingRaw('COUNT(DISTINCT kategori_dokumen_id) = ?', [$kategoriWajib->count()]);
+                $query->where(function ($q) {
+                    $q->whereNull('status_kelengkapan')
+                      ->orWhere('status_kelengkapan', '!=', 'lengkap');
                 });
-            } elseif ($statusFilter === 'dokumen_belum_lengkap') {
-                // Filter karyawan yang dokumen wajibnya belum lengkap
+            } elseif (in_array($statusFilter, ['dokumen_lengkap', 'dokumen_belum_lengkap'])) {
+                // Karyawan yang dokumen wajibnya lengkap / belum lengkap
                 $kategoriWajib = \App\Models\KategoriDokumen::where('wajib', true)->pluck('id');
-                $query->whereDoesntHave('dokumen', function($q) use ($kategoriWajib) {
-                    $q->whereIn('kategori_dokumen_id', $kategoriWajib)
-                      ->havingRaw('COUNT(DISTINCT kategori_dokumen_id) = ?', [$kategoriWajib->count()]);
-                });
+                if ($kategoriWajib->count() > 0) {
+                    if ($statusFilter === 'dokumen_lengkap') {
+                        $query->whereHas('dokumen', function($q) use ($kategoriWajib) {
+                            $q->whereIn('kategori_dokumen_id', $kategoriWajib);
+                        }, '>=', $kategoriWajib->count());
+                    } else {
+                        // belum lengkap => kurang dari jumlah kategori wajib
+                        $query->where(function ($q) use ($kategoriWajib) {
+                            $q->whereDoesntHave('dokumen', function($qq) use ($kategoriWajib) {
+                                $qq->whereIn('kategori_dokumen_id', $kategoriWajib);
+                            })
+                            ->orWhereHas('dokumen', function($qq) use ($kategoriWajib) {
+                                $qq->whereIn('kategori_dokumen_id', $kategoriWajib);
+                            }, '<', $kategoriWajib->count());
+                        });
+                    }
+                }
             }
         }
-        
+
+        return $query;
+    }
+    public function index(Request $request)
+    {
+        $query = $this->applyFilters($request, Karyawan::query());
         $karyawan = $query->paginate(15);
         
         // Data untuk dropdown filter
@@ -97,54 +116,7 @@ class LaporanController extends Controller
     
     public function exportCsv(Request $request)
     {
-        $query = Karyawan::with([
-            'user',
-            'ruangan',
-            'profesi',
-            'statusPegawai',
-            'provinsi',
-            'kabupaten',
-            'kecamatan',
-            'kelurahan',
-        ])->withCount('dokumen');
-        
-        // Terapkan filter yang sama dengan index
-        if ($request->filled('ruangan_id')) {
-            $query->where('ruangan_id', $request->ruangan_id);
-        }
-        
-        if ($request->filled('profesi_id')) {
-            $query->where('profesi_id', $request->profesi_id);
-        }
-        
-        if ($request->filled('status_pegawai_id')) {
-            $query->where('status_pegawai_id', $request->status_pegawai_id);
-        }
-        
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nik', 'like', "%$search%")
-                  ->orWhere('nip', 'like', "%$search%")
-                  ->orWhereHas('user', function($uq) use ($search) {
-                      $uq->where('name', 'like', "%$search%");
-                  });
-            });
-        }
-
-        // Jenis kelamin
-        if ($request->filled('jenis_kelamin')) {
-            $query->where('jenis_kelamin', $request->jenis_kelamin);
-        }
-
-        // Tanggal masuk range
-        if ($request->filled('tanggal_masuk_from')) {
-            $query->whereDate('tanggal_masuk_kerja', '>=', $request->tanggal_masuk_from);
-        }
-        if ($request->filled('tanggal_masuk_to')) {
-            $query->whereDate('tanggal_masuk_kerja', '<=', $request->tanggal_masuk_to);
-        }
-        
+        $query = $this->applyFilters($request, Karyawan::query());
         $fileName = 'laporan_karyawan_' . date('Y-m-d_H-i-s') . '.csv';
         
         return new StreamedResponse(function() use ($query) {
@@ -227,57 +199,38 @@ class LaporanController extends Controller
     
     public function print(Request $request)
     {
-        $query = Karyawan::with([
-            'user',
-            'ruangan',
-            'profesi',
-            'statusPegawai',
-            'provinsi',
-            'kabupaten',
-            'kecamatan',
-            'kelurahan',
-        ])->withCount('dokumen');
-        
-        // Terapkan filter yang sama
-        if ($request->filled('ruangan_id')) {
-            $query->where('ruangan_id', $request->ruangan_id);
-        }
-        
-        if ($request->filled('profesi_id')) {
-            $query->where('profesi_id', $request->profesi_id);
-        }
-        
-        if ($request->filled('status_pegawai_id')) {
-            $query->where('status_pegawai_id', $request->status_pegawai_id);
-        }
-        
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nik', 'like', "%$search%")
-                  ->orWhere('nip', 'like', "%$search%")
-                  ->orWhereHas('user', function($uq) use ($search) {
-                      $uq->where('name', 'like', "%$search%");
-                  });
-            });
-        }
-
-        // Jenis kelamin
-        if ($request->filled('jenis_kelamin')) {
-            $query->where('jenis_kelamin', $request->jenis_kelamin);
-        }
-
-        // Tanggal masuk range
-        if ($request->filled('tanggal_masuk_from')) {
-            $query->whereDate('tanggal_masuk_kerja', '>=', $request->tanggal_masuk_from);
-        }
-        if ($request->filled('tanggal_masuk_to')) {
-            $query->whereDate('tanggal_masuk_kerja', '<=', $request->tanggal_masuk_to);
-        }
-        
+        $query = $this->applyFilters($request, Karyawan::query());
         $karyawan = $query->get();
         $filters = $request->only(['ruangan_id', 'profesi_id', 'status_pegawai_id', 'search']);
         
         return view('admin.laporan-print', compact('karyawan', 'filters'));
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $fileName = 'laporan_karyawan_' . date('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download(new KaryawanExport($request), $fileName);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = $this->applyFilters($request, Karyawan::query());
+        $karyawan = $query->get();
+        $html = view('admin.laporan-pdf', [
+            'karyawan' => $karyawan,
+            'generatedAt' => now()->format('d/m/Y H:i'),
+            'filters' => $request->all(),
+        ])->render();
+
+        // Konfigurasi mPDF
+        $mpdf = new \Mpdf\Mpdf(['format' => 'A4-L']);
+        $mpdf->SetTitle('Laporan Karyawan');
+        $mpdf->WriteHTML($html);
+        $output = $mpdf->Output('', 'S'); // as string
+
+        return response($output, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="laporan_karyawan_'.date('Y-m-d_H-i-s').'.pdf"',
+        ]);
     }
 }
