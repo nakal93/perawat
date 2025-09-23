@@ -2,287 +2,95 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Data Karyawan - RSUD Dolopo</title>
+    <title>Print Laporan Karyawan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        /* F4 landscape: 330mm x 210mm */
-        @page {
-            size: 330mm 210mm;
-            margin: 8mm; /* thin margins on all sides */
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', 'Segoe UI', Roboto, Arial, 'Times New Roman', serif;
-            font-size: 10px; /* compact but readable */
-            line-height: 1.35;
-            color: #000;
-        }
-        
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-            padding: 5mm 8mm 3mm 8mm;
-            border-bottom: 1px solid #000;
-            background: #fff;
-        }
-        
-        .header h1 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        
-        .header h2 {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 11px;
-            margin-bottom: 3px;
-        }
-        
-        .content {
-            margin-top: 26mm; /* slightly smaller header block */
-            margin-bottom: 16mm; /* space for footer */
-            padding-left: 4mm;  /* thin inner padding */
-            padding-right: 4mm; /* thin inner padding */
-        }
-        
-        .info-section h3 {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-decoration: underline;
-        }
-        
-        .filter-info {
-            background-color: #f5f5f5;
-            padding: 10px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-        
-        .filter-info p {
-            margin-bottom: 5px;
-            font-size: 11px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-            table-layout: fixed; /* keep widths stable */
-            font-size: 9px;
-        }
-        
-        table, th, td {
-            border: 1px solid #000;
-        }
-        
-        th {
-            background-color: #f0f0f0;
-            padding: 6px 3px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 9px;
-        }
-        
-        td {
-            padding: 5px 3px;
-            vertical-align: top;
-            word-wrap: break-word;
-        }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .text-right {
-            text-align: right;
-        }
-        
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-top: 1px solid #000;
-            padding: 4mm 8mm;
-            background: #fff;
-        }
-        
-        .signature-section {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .signature-box {
-            width: 45%;
-            text-align: center;
-        }
-        
-        .signature-line {
-            border-bottom: 1px solid #000;
-            width: 200px;
-            margin: 50px auto 10px auto;
-        }
-        
-        .print-date {
-            font-size: 10px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
+        @page { size: A4 landscape; margin: 10mm; }
+        body { font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, sans-serif; color: #0f172a; }
+        h1 { font-size: 20px; margin: 0 0 8px 0; }
+        .meta { font-size: 12px; color: #475569; margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #cbd5e1; padding: 6px 8px; }
+        th { background: #e2e8f0; text-align: left; font-weight: 700; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        .text-right { text-align: right; }
         @media print {
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .no-print {
-                display: none;
-            }
+            .no-print { display: none !important; }
+            body { margin: 0; }
         }
-        
-        .status-badge {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: bold;
-        }
-        
-        .status-lengkap {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-belum {
-            background-color: #fff3cd;
-            color: #856404;
-        }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .btn { padding: 6px 10px; border: 1px solid #94a3b8; border-radius: 6px; background: #f1f5f9; color: #0f172a; text-decoration: none; }
+        .btn:hover { background: #e2e8f0; }
     </style>
 </head>
 <body>
-    <!-- Header Rumah Sakit (fixed) -->
-    <div class="header">
-        <h1>RSUD Dolopo</h1>
-        <h2>Laporan Data Karyawan</h2>
-    <p>Dicetak: {{ now()->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }} WIB</p>
-        @if(!empty(array_filter($filters ?? [])))
-            <p>
-                @if(!empty($filters['ruangan_id'])) Ruangan: {{ \App\Models\Ruangan::find($filters['ruangan_id'])->nama_ruangan ?? '-' }} | @endif
-                @if(!empty($filters['profesi_id'])) Profesi: {{ \App\Models\Profesi::find($filters['profesi_id'])->nama_profesi ?? '-' }} | @endif
-                @if(!empty($filters['status_pegawai_id'])) Status: {{ \App\Models\StatusPegawai::find($filters['status_pegawai_id'])->nama ?? '-' }} | @endif
-                @if(!empty($filters['search'])) Cari: "{{ $filters['search'] }}" @endif
-            </p>
-        @endif
+    <div class="toolbar no-print">
+        <h1>Print Laporan Karyawan</h1>
+        <div>
+            <button class="btn" onclick="window.print()">Print</button>
+            <a class="btn" href="{{ url()->previous() }}">Kembali</a>
+        </div>
     </div>
 
-    <div class="content">
-        <!-- Ringkasan -->
-        <div class="info-section" style="margin-bottom: 8px;">
-            <p><strong>Total Karyawan:</strong> {{ $karyawan->count() }} | 
-               <strong>Lengkap:</strong> {{ $karyawan->where('status_kelengkapan', 'Lengkap')->count() }} | 
-               <strong>Belum:</strong> {{ $karyawan->where('status_kelengkapan', '!=', 'Lengkap')->count() }}</p>
-        </div>
-    
-    <!-- Tabel Data Karyawan -->
+    <div class="meta">
+        Filter: 
+        @php $pairs = []; @endphp
+        @foreach(($filters ?? []) as $k => $v)
+            @if($v !== null && $v !== '')
+                @php $pairs[] = $k . ': ' . $v; @endphp
+            @endif
+        @endforeach
+        {{ implode(' | ', $pairs) }}
+    </div>
+
     <table>
         <thead>
             <tr>
-                <th width="3%">No</th>
-                <th width="10%">NIK/NIP</th>
-                <th width="14%">Nama & Kontak</th>
-                <th width="25%">Alamat</th>
-                <th width="18%">Unit & Profesi</th>
-                <th width="12%">Status</th>
-                <th width="6%">Dok</th>
+                <th>No</th>
+                <th>NIK</th>
+                <th>NIP</th>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>JK</th>
+                <th>HP</th>
+                <th>Ruangan</th>
+                <th>Profesi</th>
+                <th>Status Pegawai</th>
+                <th>Tgl Masuk</th>
+                <th>Provinsi</th>
+                <th>Kab/Kota</th>
+                <th>Kecamatan</th>
+                <th>Kelurahan</th>
+                <th>Dokumen</th>
+                <th>Kelengkapan</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($karyawan as $index => $k)
+            @foreach($karyawan as $i => $k)
+                @php
+                    $tglMasuk = method_exists($k->tanggal_masuk_kerja, 'format') ? $k->tanggal_masuk_kerja->format('d/m/Y') : ($k->tanggal_masuk_kerja ?: '-');
+                @endphp
                 <tr>
-                    <td class="text-center">{{ $index + 1 }}</td>
-                    <td>
-                        <div><strong>{{ $k->nik ?: '-' }}</strong></div>
-                        <div>{{ $k->nip ?: '-' }}</div>
-                        <div>JK: {{ $k->jenis_kelamin === 'Laki-laki' ? 'L' : ($k->jenis_kelamin === 'Perempuan' ? 'P' : '-') }}</div>
-                        <div>Tgl Lahir: {{ $k->tanggal_lahir ? (method_exists($k->tanggal_lahir, 'format') ? $k->tanggal_lahir->format('d/m/Y') : $k->tanggal_lahir) : '-' }}</div>
-                    </td>
-                    <td>
-                        <div><strong>{{ $k->user->name ?? '-' }}</strong></div>
-                        <div>{{ $k->user->email ?? '-' }}</div>
-                        <div>HP: {{ $k->no_hp ?? '-' }}</div>
-                    </td>
-                    <td>
-                        <div>{{ $k->alamat_detail ?? '-' }}</div>
-                        <div>Kel: {{ $k->kelurahan->name ?? '-' }}, Kec: {{ $k->kecamatan->name ?? '-' }}</div>
-                        <div>Kab/Kota: {{ $k->kabupaten->name ?? '-' }}, Prov: {{ $k->provinsi->name ?? '-' }}</div>
-                    </td>
-                    <td>
-                        <div>Ruangan: {{ $k->ruangan->nama_ruangan ?? '-' }}</div>
-                        <div>Profesi: {{ $k->profesi->nama_profesi ?? '-' }}</div>
-                        <div>Agama: {{ $k->agama ?? '-' }}</div>
-                        <div>Pendidikan: {{ $k->pendidikan_terakhir ?? '-' }}</div>
-                        <div>Tgl Masuk: {{ $k->tanggal_masuk_kerja ? (method_exists($k->tanggal_masuk_kerja, 'format') ? $k->tanggal_masuk_kerja->format('d/m/Y') : $k->tanggal_masuk_kerja) : '-' }}</div>
-                    </td>
-                    <td>
-                        <div>Status Pegawai: {{ $k->statusPegawai->nama ?? '-' }}</div>
-                        <div>Kelengkapan: {{ $k->status_kelengkapan ?? 'Belum Lengkap' }}</div>
-                    </td>
-                    <td class="text-center">{{ $k->dokumen_count ?? ($k->dokumen->count() ?? 0) }}</td>
+                    <td class="text-right">{{ $i + 1 }}</td>
+                    <td>{{ $k->nik ?: '-' }}</td>
+                    <td>{{ $k->nip ?: '-' }}</td>
+                    <td>{{ $k->user->name ?? '-' }}</td>
+                    <td>{{ $k->user->email ?? '-' }}</td>
+                    <td>{{ $k->jenis_kelamin ?: '-' }}</td>
+                    <td>{{ $k->no_hp ?: '-' }}</td>
+                    <td>{{ $k->ruangan->nama_ruangan ?? '-' }}</td>
+                    <td>{{ $k->profesi->nama_profesi ?? '-' }}</td>
+                    <td>{{ $k->statusPegawai->nama ?? '-' }}</td>
+                    <td>{{ $tglMasuk }}</td>
+                    <td>{{ $k->provinsi->name ?? '-' }}</td>
+                    <td>{{ $k->kabupaten->name ?? '-' }}</td>
+                    <td>{{ $k->kecamatan->name ?? '-' }}</td>
+                    <td>{{ $k->kelurahan->name ?? '-' }}</td>
+                    <td class="text-right">{{ $k->dokumen_count ?? 0 }}</td>
+                    <td>{{ $k->status_kelengkapan ?: 'Belum Lengkap' }}</td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center">Tidak ada data karyawan yang sesuai dengan filter.</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
-    </div>
-
-    <!-- Footer dan Tanda Tangan (fixed) -->
-    <div class="footer">
-        <div class="signature-section" style="display: flex; justify-content: space-between;">
-            <div class="signature-box" style="width: 45%; text-align:center;">
-                <p>Mengetahui,</p>
-                <p><strong>Kepala RSUD Dolopo</strong></p>
-                <div class="signature-line"></div>
-                <p>(__________________)</p>
-                <p>NIP: _______________</p>
-            </div>
-            
-            <div class="signature-box" style="width: 45%; text-align:center;">
-                <p>Dolopo, {{ now()->setTimezone('Asia/Jakarta')->format('d F Y') }}</p>
-                <p><strong>Kepala Bagian SDM</strong></p>
-                <div class="signature-line"></div>
-                <p>(__________________)</p>
-                <p>NIP: _______________</p>
-            </div>
-        </div>
-        <div style="margin-top: 10px; text-align: center; font-size: 9px; color: #666;">
-            <p>Dokumen ini dibuat otomatis oleh Sistem Informasi Karyawan RSUD Dolopo</p>
-        </div>
-    </div>
-    
-    <!-- Auto Print Script -->
-    <script>
-        window.onload = function() {
-            window.print();
-        };
-    </script>
 </body>
 </html>

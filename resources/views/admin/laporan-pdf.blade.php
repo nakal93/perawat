@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Laporan Karyawan</title>
     <style>
-        @page { margin: 18mm 12mm; }
+        @page { margin: 16mm 12mm; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #0f172a; }
         h1 { font-size: 18px; margin: 0 0 8px 0; }
         .meta { font-size: 11px; color: #475569; margin-bottom: 12px; }
@@ -20,7 +20,7 @@
 <body>
     <div class="header">
         <h1>Laporan Karyawan</h1>
-        <div class="small">Dibuat: {{ $generatedAt }}</div>
+        <div class="small">Dibuat: {{ now()->format('d/m/Y H:i') }}</div>
     </div>
     <div class="meta">
         Filter: 
