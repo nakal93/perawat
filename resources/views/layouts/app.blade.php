@@ -19,27 +19,7 @@
     </head>
     <body class="font-inter antialiased bg-slate-50">
         <div class="min-h-screen">
-            <!-- Mobile menu button (hidden on lg+ screens) for Admin only -->
-            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'superuser')
-            <div class="lg:hidden">
-                <div class="bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <button type="button" id="mobile-menu-button" class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                        </button>
-                        <h1 class="ml-3 text-lg font-semibold text-slate-900">RSUD Dolopo</h1>
-                    </div>
-                    <!-- User info on mobile -->
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span class="text-white font-semibold text-xs">{{ substr(auth()->user()->name, 0, 1) }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
+            <!-- Removed separate mobile-only admin header to avoid duplicate headers; hamburger is now in sticky header -->
 
             <!-- Sidebar for Admin -->
             @if(auth()->user()->role === 'admin' || auth()->user()->role === 'superuser')
@@ -302,7 +282,13 @@
                 <div class="lg:pl-64">
                     @hasSection('breadcrumb')
                     <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-slate-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-                        <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+                        <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 items-center">
+                            <!-- Mobile hamburger to toggle sidebar -->
+                            <button type="button" id="mobile-menu-button" class="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
                             <div class="flex flex-1 items-center">
                                 <nav class="flex" aria-label="Breadcrumb">
                                     <ol class="flex items-center space-x-2">

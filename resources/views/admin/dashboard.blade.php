@@ -74,27 +74,6 @@
 @endpush
 
 @section('content')
-<!-- Header Section -->
-<div class="bg-white border-b border-slate-200 -mx-4 sm:-mx-6 lg:-mx-8 mb-6">
-    <div class="px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
-                <p class="text-slate-600 mt-1">Selamat datang di Sistem Pendataan Karyawan RSUD Dolopo</p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <div class="text-right">
-                    <p class="text-sm font-medium text-slate-900">{{ auth()->user()->name }}</p>
-                    <p class="text-xs text-slate-500">{{ ucfirst(auth()->user()->role) }}</p>
-                </div>
-                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span class="text-white font-semibold text-sm">{{ substr(auth()->user()->name, 0, 1) }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Main Dashboard Content -->
         <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             <!-- Enhanced Statistics Cards dengan responsive design -->
