@@ -877,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const trendCanvas = document.getElementById('trendChart');
     if (trendCanvas) {
         const trendCtx = trendCanvas.getContext('2d');
-        new Chart(trendCtx, {
+        const trendChart = new Chart(trendCtx, {
             type: 'line',
             data: {
                 labels: trendData.map(item => item.tahun),
@@ -912,6 +912,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+
+        // Click to filter by year (set date range of that year)
+        trendCanvas.onclick = (evt) => {
+            const points = trendChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+            if (!points.length) return;
+            const idx = points[0].index;
+            const year = trendData[idx]?.tahun;
+            if (!year) return;
+            const url = new URL(window.location.href);
+            url.searchParams.set('tanggal_masuk_from', `${year}-01-01`);
+            url.searchParams.set('tanggal_masuk_to', `${year}-12-31`);
+            url.searchParams.set('page', '1');
+            window.location.href = url.toString();
+        };
     }
 
     // Chart 6: Distribusi Jenis Kelamin (Doughnut)
