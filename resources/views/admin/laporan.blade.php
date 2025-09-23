@@ -65,20 +65,52 @@
           <input type="text" name="search" value="{{ request('search') }}" placeholder="NIK, NIP, atau Nama..." class="w-full rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
       </div>
-      <div class="mt-4 flex flex-wrap items-center gap-3">
-        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Filter</button>
-        <a href="{{ route('admin.laporan') }}" class="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600">Reset</a>
-        <div class="ml-auto flex items-center gap-3">
-          <a href="{{ route('admin.laporan.export-csv', request()->query()) }}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Unduh CSV</a>
-          <a href="{{ route('admin.laporan.export-excel', request()->query()) }}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">Unduh Excel</a>
-          <a href="{{ route('admin.laporan.export-pdf', request()->query()) }}" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Unduh PDF</a>
-          <a href="{{ route('admin.laporan.print', request()->query()) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Cetak F4</a>
+      <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="flex flex-wrap gap-3">
+          <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-sm font-medium rounded-xl hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+            </svg>
+            Filter
+          </button>
+          <a href="{{ route('admin.laporan') }}" class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-slate-500 to-slate-600 text-white text-sm font-medium rounded-xl hover:from-slate-600 hover:to-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Reset
+          </a>
+        </div>
+        <div class="flex flex-wrap gap-2 sm:ml-auto">
+          <a href="{{ route('admin.laporan.export-csv', request()->query()) }}" class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-medium rounded-lg hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transform transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
+            <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            CSV
+          </a>
+          <a href="{{ route('admin.laporan.export-excel', request()->query()) }}" class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-medium rounded-lg hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transform transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
+            <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Excel
+          </a>
+          <a href="{{ route('admin.laporan.export-pdf', request()->query()) }}" class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-medium rounded-lg hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transform transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
+            <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707L13.414 3.7a1 1 0 00-.707-.293H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            PDF
+          </a>
+          <a href="{{ route('admin.laporan.print', request()->query()) }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transform transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
+            <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+            </svg>
+            Print
+          </a>
         </div>
       </div>
     </form>
 
     <!-- Quick Stats -->
-    <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-6 gap-2 mb-4">
+    <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-6 gap-2 mb-6">
       <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-2">
         <div class="text-xs text-slate-500">Total Karyawan</div>
         <div class="text-lg font-bold text-blue-600">{{ $karyawan->total() }}</div>
@@ -91,6 +123,53 @@
       <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-2">
         <div class="text-xs text-slate-500">Data Diri Kurang</div>
         <div class="text-lg font-bold text-yellow-600">{{ $karyawan->total() - $lengkapCount }}</div>
+      </div>
+    </div>
+
+    <!-- Interactive Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Ruangan Chart -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          Per Ruangan
+        </h3>
+        <canvas id="ruanganChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Profesi Chart -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"></path>
+          </svg>
+          Per Profesi
+        </h3>
+        <canvas id="profesiChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Status Pegawai Chart -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+          </svg>
+          Status Pegawai
+        </h3>
+        <canvas id="statusChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Gender Chart -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          Jenis Kelamin
+        </h3>
+        <canvas id="genderChart" class="w-full h-64"></canvas>
       </div>
     </div>
 
@@ -224,4 +303,191 @@
     </div>
   </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart colors
+    const colors = {
+        primary: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#14b8a6'],
+        hover: ['#2563eb', '#7c3aed', '#059669', '#d97706', '#dc2626', '#4f46e5', '#db2777', '#0d9488']
+    };
+
+    // Helper function to create chart data
+    function createChartData(labels, data, backgroundColor, borderColor) {
+        return {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColor,
+                borderColor: borderColor,
+                borderWidth: 2,
+                hoverBorderWidth: 3
+            }]
+        };
+    }
+
+    // Helper function to create chart options with click handler
+    function createChartOptions(title, filterParam, filterValue) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#f8fafc',
+                    borderColor: '#475569',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    padding: 12
+                }
+            },
+            onHover: (event, activeElements) => {
+                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+            },
+            onClick: (event, activeElements) => {
+                if (activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const value = filterValue[index];
+                    
+                    // Build filter URL
+                    const currentUrl = new URL(window.location);
+                    currentUrl.searchParams.set(filterParam, value);
+                    currentUrl.searchParams.delete('page'); // Reset pagination
+                    
+                    // Navigate to filtered results
+                    window.location.href = currentUrl.toString();
+                }
+            }
+        };
+    }
+
+    // Ruangan Chart
+    @php
+        $ruanganStats = $karyawan->groupBy('ruangan.nama_ruangan')->map->count()->sortDesc()->take(8);
+        $ruanganLabels = $ruanganStats->keys()->toArray();
+        $ruanganData = $ruanganStats->values()->toArray();
+        $ruanganIds = $ruangan->whereIn('nama_ruangan', $ruanganLabels)->pluck('id', 'nama_ruangan')->toArray();
+    @endphp
+    
+    const ruanganChart = new Chart(document.getElementById('ruanganChart'), {
+        type: 'doughnut',
+        data: createChartData(
+            @json($ruanganLabels),
+            @json($ruanganData),
+            colors.primary,
+            colors.hover
+        ),
+        options: createChartOptions(
+            'Per Ruangan',
+            'ruangan_id',
+            @json(array_values($ruanganIds))
+        )
+    });
+
+    // Profesi Chart
+    @php
+        $profesiStats = $karyawan->groupBy('profesi.nama_profesi')->map->count()->sortDesc()->take(8);
+        $profesiLabels = $profesiStats->keys()->toArray();
+        $profesiData = $profesiStats->values()->toArray();
+        $profesiIds = $profesi->whereIn('nama_profesi', $profesiLabels)->pluck('id', 'nama_profesi')->toArray();
+    @endphp
+    
+    const profesiChart = new Chart(document.getElementById('profesiChart'), {
+        type: 'bar',
+        data: createChartData(
+            @json($profesiLabels),
+            @json($profesiData),
+            colors.primary[1],
+            colors.hover[1]
+        ),
+        options: {
+            ...createChartOptions(
+                'Per Profesi',
+                'profesi_id',
+                @json(array_values($profesiIds))
+            ),
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f1f5f9'
+                    },
+                    ticks: {
+                        color: '#64748b'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        maxRotation: 45
+                    }
+                }
+            }
+        }
+    });
+
+    // Status Pegawai Chart
+    @php
+        $statusStats = $karyawan->groupBy('statusPegawai.nama')->map->count()->sortDesc();
+        $statusLabels = $statusStats->keys()->toArray();
+        $statusData = $statusStats->values()->toArray();
+        $statusIds = $statusPegawai->whereIn('nama', $statusLabels)->pluck('id', 'nama')->toArray();
+    @endphp
+    
+    const statusChart = new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: createChartData(
+            @json($statusLabels),
+            @json($statusData),
+            colors.primary.slice(2),
+            colors.hover.slice(2)
+        ),
+        options: createChartOptions(
+            'Status Pegawai',
+            'status_pegawai_id',
+            @json(array_values($statusIds))
+        )
+    });
+
+    // Gender Chart
+    @php
+        $genderStats = $karyawan->groupBy('jenis_kelamin')->map->count();
+        $genderLabels = $genderStats->keys()->filter()->toArray();
+        $genderData = $genderStats->values()->toArray();
+    @endphp
+    
+    const genderChart = new Chart(document.getElementById('genderChart'), {
+        type: 'doughnut',
+        data: createChartData(
+            @json($genderLabels),
+            @json($genderData),
+            ['#ec4899', '#3b82f6'],
+            ['#db2777', '#2563eb']
+        ),
+        options: createChartOptions(
+            'Jenis Kelamin',
+            'jenis_kelamin',
+            @json($genderLabels)
+        )
+    });
+});
+</script>
+@endpush
+
 @endsection
