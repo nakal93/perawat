@@ -4,10 +4,10 @@
 
 @section('content')
 <div class="bg-gradient-to-br from-slate-50 to-gray-100 pt-6">
-  <div class="w-full px-6 pb-10">
+  <div class="w-full px-2 sm:px-4 lg:px-6 pb-10">
     <!-- Filters -->
-    <form method="GET" action="{{ route('admin.laporan') }}" class="bg-white rounded border border-slate-200 p-4 mb-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <form method="GET" action="{{ route('admin.laporan') }}" class="bg-white rounded border border-slate-200 p-3 sm:p-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-2">Unit (Ruangan)</label>
           <select name="ruangan_id" class="w-full rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500">
@@ -110,7 +110,7 @@
     </form>
 
     <!-- Quick Stats -->
-    <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-6 gap-2 mb-6">
+    <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-6 gap-1 sm:gap-2 mb-4 sm:mb-6">
       <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-2">
         <div class="text-xs text-slate-500">Total Karyawan</div>
         <div class="text-lg font-bold text-blue-600">{{ $karyawan->total() }}</div>
@@ -127,55 +127,63 @@
     </div>
 
     <!-- Interactive Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
       <!-- Ruangan Chart -->
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-3 sm:p-4">
+        <h3 class="text-base font-semibold text-slate-800 mb-3 flex items-center">
+          <svg class="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
           </svg>
           Per Ruangan
         </h3>
-        <canvas id="ruanganChart" class="w-full h-64"></canvas>
+        <div class="relative" style="height: 200px;">
+          <canvas id="ruanganChart"></canvas>
+        </div>
       </div>
 
       <!-- Profesi Chart -->
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-          <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-3 sm:p-4">
+        <h3 class="text-base font-semibold text-slate-800 mb-3 flex items-center">
+          <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"></path>
           </svg>
           Per Profesi
         </h3>
-        <canvas id="profesiChart" class="w-full h-64"></canvas>
+        <div class="relative" style="height: 200px;">
+          <canvas id="profesiChart"></canvas>
+        </div>
       </div>
 
       <!-- Status Pegawai Chart -->
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-          <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-3 sm:p-4">
+        <h3 class="text-base font-semibold text-slate-800 mb-3 flex items-center">
+          <svg class="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
           </svg>
           Status Pegawai
         </h3>
-        <canvas id="statusChart" class="w-full h-64"></canvas>
+        <div class="relative" style="height: 200px;">
+          <canvas id="statusChart"></canvas>
+        </div>
       </div>
 
       <!-- Gender Chart -->
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-          <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-3 sm:p-4">
+        <h3 class="text-base font-semibold text-slate-800 mb-3 flex items-center">
+          <svg class="w-4 h-4 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
           </svg>
           Jenis Kelamin
         </h3>
-        <canvas id="genderChart" class="w-full h-64"></canvas>
+        <div class="relative" style="height: 200px;">
+          <canvas id="genderChart"></canvas>
+        </div>
       </div>
     </div>
 
     <!-- Data List -->
     <div class="bg-white rounded border border-slate-200 overflow-hidden">
-      <div class="px-3 py-2 border-b border-slate-200 bg-indigo-600">
+      <div class="px-2 sm:px-3 py-2 border-b border-slate-200 bg-indigo-600">
         <h3 class="text-sm font-semibold text-white">Data Karyawan <span class="text-sm font-normal text-indigo-100">({{ $karyawan->total() }} total)</span></h3>
       </div>
 
@@ -183,19 +191,19 @@
         <table class="w-full">
           <thead class="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">No</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Identitas</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Kontak & Alamat</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Unit & Profesi</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-              <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Aksi</th>
+              <th class="px-2 sm:px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">No</th>
+              <th class="px-2 sm:px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Identitas</th>
+              <th class="px-2 sm:px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Kontak & Alamat</th>
+              <th class="px-2 sm:px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Unit & Profesi</th>
+              <th class="px-2 sm:px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+              <th class="px-2 sm:px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Aksi</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-200">
             @forelse($karyawan as $k)
               <tr class="hover:bg-slate-50 align-top">
-                <td class="px-3 py-2 text-sm text-slate-900">{{ ($karyawan->currentPage() - 1) * $karyawan->perPage() + $loop->iteration }}</td>
-                <td class="px-3 py-2 text-sm">
+                <td class="px-2 sm:px-3 py-2 text-sm text-slate-900">{{ ($karyawan->currentPage() - 1) * $karyawan->perPage() + $loop->iteration }}</td>
+                <td class="px-2 sm:px-3 py-2 text-sm">
                   <div class="text-slate-900 font-medium">{{ $k->user->name ?? '-' }}</div>
                   <div class="text-slate-500 text-xs">NIK: {{ $k->nik ?: '-' }}</div>
                   <div class="text-slate-500 text-xs">NIP: {{ $k->nip ?: '-' }}</div>
@@ -234,7 +242,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="6" class="px-6 py-12 text-center text-slate-500">Tidak ada karyawan yang sesuai dengan filter.</td>
+                <td colspan="6" class="px-3 sm:px-6 py-12 text-center text-slate-500">Tidak ada karyawan yang sesuai dengan filter.</td>
               </tr>
             @endforelse
           </tbody>
@@ -245,7 +253,7 @@
       <div class="md:hidden divide-y divide-slate-100">
         @forelse($karyawan as $k)
           <details class="group">
-            <summary class="px-4 py-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50">
+            <summary class="px-3 py-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50">
               <div>
                 <div class="font-semibold text-slate-900">{{ $k->user->name ?? '-' }}</div>
                 <div class="text-xs text-slate-500">{{ $k->ruangan->nama_ruangan ?? '-' }} • {{ $k->profesi->nama_profesi ?? '-' }}</div>
@@ -254,7 +262,7 @@
                 {{ $k->status_kelengkapan === 'lengkap' ? 'Lengkap' : 'Belum Lengkap' }}
               </span>
             </summary>
-            <div class="px-4 pb-4 text-sm text-slate-700">
+            <div class="px-3 pb-4 text-sm text-slate-700">
               <div class="grid grid-cols-1 gap-2">
                 <div class="bg-slate-50 rounded-lg p-3">
                   <div class="text-slate-900 font-medium mb-1">Identitas</div>
@@ -291,12 +299,12 @@
             </div>
           </details>
         @empty
-          <div class="px-6 py-12 text-center text-slate-500">Tidak ada karyawan yang sesuai dengan filter.</div>
+          <div class="px-3 sm:px-6 py-12 text-center text-slate-500">Tidak ada karyawan yang sesuai dengan filter.</div>
         @endforelse
       </div>
 
       @if($karyawan->hasPages())
-        <div class="px-4 py-3 border-t border-slate-200">
+        <div class="px-2 sm:px-4 py-3 border-t border-slate-200">
           {{ $karyawan->withQueryString()->links() }}
         </div>
       @endif
@@ -332,16 +340,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function createChartOptions(title, filterParam, filterValue) {
         return {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
             plugins: {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 20,
+                        padding: 15,
                         usePointStyle: true,
                         font: {
-                            size: 11
-                        }
+                            size: 10
+                        },
+                        boxWidth: 12
                     }
                 },
                 tooltip: {
@@ -351,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     borderColor: '#475569',
                     borderWidth: 1,
                     cornerRadius: 8,
-                    padding: 12
+                    padding: 10
                 }
             },
             onHover: (event, activeElements) => {
@@ -419,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'profesi_id',
                 @json(array_values($profesiIds))
             ),
+            aspectRatio: 2,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -426,7 +437,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         color: '#f1f5f9'
                     },
                     ticks: {
-                        color: '#64748b'
+                        color: '#64748b',
+                        font: {
+                            size: 10
+                        }
                     }
                 },
                 x: {
@@ -435,7 +449,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     ticks: {
                         color: '#64748b',
-                        maxRotation: 45
+                        maxRotation: 0,
+                        font: {
+                            size: 9
+                        }
                     }
                 }
             }
