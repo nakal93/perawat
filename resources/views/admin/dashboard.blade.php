@@ -75,7 +75,7 @@
 
 @section('content')
 <!-- Main Dashboard Content -->
-        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+    <div class="w-full py-4 sm:py-6 lg:py-8">
             <!-- Enhanced Statistics Cards dengan responsive design -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <!-- Total Karyawan -->
