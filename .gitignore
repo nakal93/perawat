@@ -1,43 +1,68 @@
-*.log
-.DS_Store
+# Laravel
 .env
 .env.backup
 .env.production
-.phpactor.json
+.env.local
+.env.testing
 .phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+auth.json
+
+# Dependencies
+/vendor
+/node_modules
+
+# Build artifacts
+/public/build
+/public/hot
+/public/mix-manifest.json
+/public/storage
+
+# Storage and cache
+/storage/*.key
+/storage/pail
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/backups
+/bootstrap/cache/*.php
+
+# Development files
+*.log
+.DS_Store
+Thumbs.db
+.phpactor.json
+cookies.txt
+debug_*.php
+deploy.sh
+setup-nginx-dev.sh
+test*.sh
+*.backup
+*.bak
+*.bak_*
+*_backup.*
+
+# IDE and editors
 /.fleet
 /.idea
 /.nova
 /.phpunit.cache
 /.vscode
 /.zed
-/auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
-Thumbs.db
 
-# Development specific
-cookies.txt
-setup-nginx-dev.sh
-debug_*.php
+# Testing
 /public/pdf-test.html
+phpunit.xml
+.phpunit.cache
 
-# Storage files
-/storage/app/public/*
-!/storage/app/public/.gitkeep
-
-# Cache
-/bootstrap/cache/*.php
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-
-# Local backups (SQL dumps etc.)
-/storage/backups
+# Temporary files
+temp-*
+*.tmp
+*.temp
