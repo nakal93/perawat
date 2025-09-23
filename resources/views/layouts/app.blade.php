@@ -280,7 +280,6 @@
                 
                 <!-- Enhanced Main content with responsive sidebar offset -->
                 <div class="lg:pl-64">
-                    @hasSection('breadcrumb')
                     <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-slate-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 items-center">
                             <!-- Mobile hamburger to toggle sidebar -->
@@ -304,7 +303,7 @@
                                                 <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                                                 </svg>
-                                                <span class="ml-2 text-sm font-medium text-gray-900">@yield('breadcrumb')</span>
+                                                <span class="ml-2 text-sm font-medium text-gray-900">@yield('breadcrumb', 'Area Admin')</span>
                                             </div>
                                         </li>
                                     </ol>
@@ -362,10 +361,9 @@
                             </div>
                         </div>
                     </div>
-                    @endif
 
                     <!-- Main content area -->
-                    <main class="@hasSection('breadcrumb') pt-0 @else pt-6 @endif w-full px-6 pb-6">
+                    <main class="pt-0 w-full px-6 pb-6">
                         @yield('content')
                     </main>
                 </div>
