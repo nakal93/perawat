@@ -29,7 +29,7 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64">
+                <div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64 flex flex-col h-full">
                     <!-- Enhanced Header dengan logo dan nama RSUD -->
                     <div class="flex items-center h-16 px-6 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
                         <!-- Decorative background elements -->
@@ -62,7 +62,7 @@
                     </div>
                     
                     <!-- Enhanced Navigation Menu -->
-                    <nav class="flex-1 px-4 py-6 overflow-y-auto">
+                    <nav class="flex-1 min-h-0 px-4 py-6 overflow-y-auto overscroll-contain">
                         <!-- User Profile Section -->
                         <div class="mb-6 px-3 py-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200">
                             <div class="flex items-center space-x-3">
@@ -373,7 +373,7 @@
                 <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden hidden"></div>
 
                 <!-- Sidebar -->
-                <div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64">
+                <div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64 flex flex-col h-full">
                     <!-- Header -->
                     <div class="flex items-center h-16 px-6 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-indigo-600/20"></div>
@@ -401,7 +401,7 @@
                     </div>
 
                     <!-- Navigation -->
-                    <nav class="flex-1 px-4 py-6 overflow-y-auto">
+                    <nav class="flex-1 min-h-0 px-4 py-6 overflow-y-auto overscroll-contain">
                         <!-- User Profile -->
                         <div class="mb-6 px-3 py-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200">
                             <div class="flex items-center space-x-3">
