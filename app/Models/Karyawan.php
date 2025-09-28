@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Karyawan extends Model
 {
+    use LogsActivity;
+    
     protected $table = 'karyawan';
     
     protected $fillable = [
@@ -104,5 +108,13 @@ class Karyawan extends Model
     public function statusPegawai()
     {
         return $this->belongsTo(StatusPegawai::class, 'status_pegawai_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nik', 'nip', 'alamat', 'tanggal_lahir', 'no_hp', 'ruangan_id', 'profesi_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

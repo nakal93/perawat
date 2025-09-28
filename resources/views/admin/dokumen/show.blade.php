@@ -41,7 +41,7 @@
                     <p class="text-sm text-gray-600">Informasi lengkap dokumen karyawan</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-2">
-                    @if($dokumen->file_path && file_exists(storage_path('app/public/' . $dokumen->file_path)))
+                    @if($dokumen->file_path)
                         <a href="{{ route('admin.dokumen.download', $dokumen) }}" 
                            class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,6 +77,27 @@
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900">Informasi Dokumen</h3>
                     </div>
+
+                    @php
+                        // Hitung ukuran file dari storage privat; fallback ke public
+                        $sizeBytes = null;
+                        try {
+                            if ($dokumen->file_path) {
+                                if (Storage::disk('local')->exists($dokumen->file_path)) {
+                                    $sizeBytes = Storage::disk('local')->size($dokumen->file_path);
+                                } elseif (Storage::disk('public')->exists($dokumen->file_path)) {
+                                    $sizeBytes = Storage::disk('public')->size($dokumen->file_path);
+                                }
+                            }
+                        } catch (\Throwable $e) { $sizeBytes = null; }
+                        $sizeHuman = '-';
+                        if (is_int($sizeBytes)) {
+                            $units = ['B','KB','MB','GB','TB'];
+                            $pow = $sizeBytes > 0 ? floor(log($sizeBytes, 1024)) : 0;
+                            $pow = min($pow, count($units)-1);
+                            $sizeHuman = number_format($sizeBytes / pow(1024, $pow), $pow >= 2 ? 2 : 0).' '.$units[$pow];
+                        }
+                    @endphp
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
@@ -142,12 +163,17 @@
                                     {{ $dokumen->created_at->format('d M Y H:i') }}
                                 </dd>
                             </div>
+
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Ukuran File</dt>
+                                <dd class="text-sm font-semibold text-gray-900">{{ $sizeHuman }}</dd>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Preview Dokumen (jika ada) -->
-                @if($dokumen->file_path && file_exists(storage_path('app/public/' . $dokumen->file_path)))
+                <!-- Preview Dokumen (menggunakan route preview privat) -->
+                @if($dokumen->file_path)
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -161,27 +187,27 @@
 
                     @php
                         $fileExtension = pathinfo($dokumen->file_name, PATHINFO_EXTENSION);
-                        $filePath = asset('storage/' . $dokumen->file_path);
+                        $fileRel = route('admin.dokumen.preview', $dokumen);
                     @endphp
 
                     @if(in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
                         <!-- Preview untuk gambar -->
                         <div class="border rounded-lg overflow-hidden">
-                            <img src="{{ $filePath }}" 
+                            <img src="{{ $fileRel }}" 
                                  alt="{{ $dokumen->file_name }}" 
                                  class="w-full h-auto max-h-96 object-contain bg-gray-50"
-                                 onclick="openImageModal('{{ $filePath }}', '{{ $dokumen->file_name }}')">
+                                 onclick="openImageModal('{{ $fileRel }}', '{{ $dokumen->file_name }}')">
                         </div>
                         <p class="text-xs text-gray-500 mt-2">Klik gambar untuk memperbesar</p>
                     @elseif(strtolower($fileExtension) === 'pdf')
                         <!-- Preview untuk PDF -->
                         <div class="border rounded-lg overflow-hidden">
-                            <iframe src="{{ $filePath }}" 
+                            <iframe src="{{ $fileRel }}" 
                                     class="w-full h-96" 
                                     frameborder="0">
                             </iframe>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Preview PDF - <a href="{{ $filePath }}" target="_blank" class="text-blue-600 hover:underline">Buka di tab baru</a></p>
+                        <p class="text-xs text-gray-500 mt-2">Preview PDF - <a href="{{ $fileRel }}" target="_blank" class="text-blue-600 hover:underline">Buka di tab baru</a></p>
                     @else
                         <!-- File lainnya -->
                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
@@ -190,11 +216,11 @@
                             </svg>
                             <p class="text-gray-600 mb-2">File: {{ $dokumen->file_name }}</p>
                             <p class="text-sm text-gray-500">Preview tidak tersedia untuk tipe file ini</p>
-                            <a href="{{ $filePath }}" target="_blank" class="inline-flex items-center mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            <a href="{{ route('admin.dokumen.download', $dokumen) }}" class="inline-flex items-center mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                 </svg>
-                                Buka File
+                                Unduh File
                             </a>
                         </div>
                     @endif
@@ -280,7 +306,7 @@
                             Edit Dokumen
                         </a>
                         
-                        @if($dokumen->file_path && file_exists(storage_path('app/public/' . $dokumen->file_path)))
+                        @if($dokumen->file_path)
                         <a href="{{ route('admin.dokumen.download', $dokumen) }}" 
                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

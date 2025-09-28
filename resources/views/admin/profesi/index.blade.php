@@ -7,7 +7,12 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Manajemen Profesi</h1>
-            <p class="text-gray-600 mt-1">Kelola profesi/jabatan karyawan</p>
+            <p class="text-gray-600 mt-1">Kelola profesi / Jabatan Profesi</p>
+            <div class="mt-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                    Total Profesi: {{ $profesi->total() }}
+                </span>
+            </div>
         </div>
         <a href="{{ route('admin.profesi.create') }}" 
            class="mt-4 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
@@ -36,7 +41,7 @@
                             Deskripsi
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jumlah Karyawan
+                            Jumlah Profesi
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -61,7 +66,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $item->karyawan_count ?? 0 }} karyawan
+                                    {{ $item->karyawan_count ?? 0 }} {{ strtolower($item->nama_profesi) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

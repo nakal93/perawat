@@ -9,6 +9,7 @@ use App\Models\KategoriDokumen;
 use App\Models\Karyawan;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class DokumenController extends Controller
 {
@@ -73,14 +74,38 @@ class DokumenController extends Controller
             'berlaku_seumur_hidup' => 'boolean',
         ]);
 
-        // Handle file upload
+        // Handle file upload to private storage (local) with deterministic naming
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $filepath = $file->storeAs('dokumen', $filename, 'public');
-            
+            $karyawan = Karyawan::with('user')->findOrFail($validated['karyawan_id']);
+            $kategori = KategoriDokumen::findOrFail($validated['kategori_dokumen_id']);
+            // Title-case untuk nama karyawan, lalu jadikan slug '-'
+            $namePart = Str::of(optional($karyawan->user)->name ?? 'User')
+                ->replace(['/', '\\', '_', '-'], ' ')
+                ->squish()
+                ->lower()
+                ->title()
+                ->replaceMatches('/[^A-Za-z0-9\s]+/', '')
+                ->replaceMatches('/\s+/', '-')
+                ->trim('-');
+            $katPart = Str::of($kategori->nama_kategori ?? 'Dokumen')
+                ->replace(['/', '\\'], '-')
+                ->replaceMatches('/[^A-Za-z0-9\-\s_]+/', '')
+                ->trim()
+                ->replaceMatches('/[\s_]+/', '-')
+                ->trim('-');
+            $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+            $base = $namePart.'-'.$katPart;
+            $candidate = $base.'.'.$ext;
+            $i = 2;
+            while (Storage::disk('local')->exists('dokumen/'.$candidate) || Storage::disk('public')->exists('dokumen/'.$candidate)) {
+                $candidate = $base.'-'.$i.'.'.$ext;
+                $i++;
+            }
+            $filepath = $file->storeAs('dokumen', $candidate, 'local');
+
             $validated['file_path'] = $filepath;
-            $validated['file_name'] = $file->getClientOriginalName();
+            $validated['file_name'] = $candidate;
         }
 
         $validated['berlaku_seumur_hidup'] = $request->boolean('berlaku_seumur_hidup');
@@ -118,19 +143,43 @@ class DokumenController extends Controller
             'berlaku_seumur_hidup' => 'boolean',
         ]);
 
-        // Handle file upload if new file provided
+        // Handle file upload if new file provided (with deterministic naming)
         if ($request->hasFile('file')) {
-            // Delete old file
-            if ($dokumen->file_path && Storage::disk('public')->exists($dokumen->file_path)) {
+            // Delete old file from both disks (legacy/public and new/local)
+            if ($dokumen->file_path) {
                 Storage::disk('public')->delete($dokumen->file_path);
+                Storage::disk('local')->delete($dokumen->file_path);
             }
-            
+
             $file = $request->file('file');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $filepath = $file->storeAs('dokumen', $filename, 'public');
-            
+            $karyawan = Karyawan::with('user')->findOrFail($validated['karyawan_id']);
+            $kategori = KategoriDokumen::findOrFail($validated['kategori_dokumen_id']);
+            $namePart = Str::of(optional($karyawan->user)->name ?? 'User')
+                ->replace(['/', '\\', '_', '-'], ' ')
+                ->squish()
+                ->lower()
+                ->title()
+                ->replaceMatches('/[^A-Za-z0-9\s]+/', '')
+                ->replaceMatches('/\s+/', '-')
+                ->trim('-');
+            $katPart = Str::of($kategori->nama_kategori ?? 'Dokumen')
+                ->replace(['/', '\\'], '-')
+                ->replaceMatches('/[^A-Za-z0-9\-\s_]+/', '')
+                ->trim()
+                ->replaceMatches('/[\s_]+/', '-')
+                ->trim('-');
+            $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+            $base = $namePart.'-'.$katPart;
+            $candidate = $base.'.'.$ext;
+            $i = 2;
+            while (Storage::disk('local')->exists('dokumen/'.$candidate) || Storage::disk('public')->exists('dokumen/'.$candidate)) {
+                $candidate = $base.'-'.$i.'.'.$ext;
+                $i++;
+            }
+            $filepath = $file->storeAs('dokumen', $candidate, 'local');
+
             $validated['file_path'] = $filepath;
-            $validated['file_name'] = $file->getClientOriginalName();
+            $validated['file_name'] = $candidate;
         }
 
         $validated['berlaku_seumur_hidup'] = $request->boolean('berlaku_seumur_hidup');
@@ -143,8 +192,9 @@ class DokumenController extends Controller
 
     public function destroy(DokumenKaryawan $dokumen)
     {
-        // Delete file from storage
-        if ($dokumen->file_path && Storage::disk('public')->exists($dokumen->file_path)) {
+        // Delete file from storage (both disks)
+        if ($dokumen->file_path) {
+            Storage::disk('local')->delete($dokumen->file_path);
             Storage::disk('public')->delete($dokumen->file_path);
         }
 
@@ -156,10 +206,51 @@ class DokumenController extends Controller
 
     public function download(DokumenKaryawan $dokumen)
     {
-        if (!$dokumen->file_path || !Storage::disk('public')->exists($dokumen->file_path)) {
+        if (!$dokumen->file_path) {
             abort(404, 'File tidak ditemukan.');
         }
+        if (Storage::disk('local')->exists($dokumen->file_path)) {
+            return Storage::disk('local')->download($dokumen->file_path, $dokumen->file_name);
+        }
+        if (Storage::disk('public')->exists($dokumen->file_path)) {
+            return Storage::disk('public')->download($dokumen->file_path, $dokumen->file_name);
+        }
+        abort(404, 'File tidak ditemukan.');
+    }
 
-        return Storage::disk('public')->download($dokumen->file_path, $dokumen->file_name);
+    /**
+     * Stream file inline for preview in admin.
+     */
+    public function preview(DokumenKaryawan $dokumen)
+    {
+        if (!$dokumen->file_path) {
+            abort(404);
+        }
+        $disk = Storage::disk('local')->exists($dokumen->file_path) ? 'local' : (Storage::disk('public')->exists($dokumen->file_path) ? 'public' : null);
+        if (!$disk) abort(404);
+
+        $mime = null;
+        try { $mime = Storage::disk($disk)->mimeType($dokumen->file_path); } catch (\Throwable $e) {}
+        if (!$mime) {
+            $ext = strtolower(pathinfo($dokumen->file_name ?: $dokumen->file_path, PATHINFO_EXTENSION));
+            $map = [
+                'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp',
+                'pdf' => 'application/pdf', 'doc' => 'application/msword', 'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            $mime = $map[$ext] ?? 'application/octet-stream';
+        }
+
+        $stream = Storage::disk($disk)->readStream($dokumen->file_path);
+        if (!$stream) abort(404);
+
+        return response()->stream(function () use ($stream) {
+            fpassthru($stream);
+            if (is_resource($stream)) fclose($stream);
+        }, 200, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="'.addslashes($dokumen->file_name ?: basename($dokumen->file_path)).'"',
+            'Cache-Control' => 'private, max-age=0, no-store, no-cache, must-revalidate',
+            'Pragma' => 'no-cache',
+        ]);
     }
 }

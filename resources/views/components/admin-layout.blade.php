@@ -69,7 +69,7 @@
                                 </div>
                                 <div>
                                     <h1 class="text-white font-bold text-lg tracking-tight">RSUD Dolopo</h1>
-                                    <p class="text-blue-100 text-xs font-medium">Sistem Pendataan Karyawan</p>
+                                    <p class="text-blue-100 text-xs font-medium">Sistem Pendataan Komite Keperawatan</p>
                                 </div>
                             </div>
                             
@@ -298,7 +298,7 @@
         </div>
         
         <!-- Mobile Overlay -->
-        <div x-show="sidebarOpen" 
+    <div x-show="sidebarOpen" x-cloak 
              @click="sidebarOpen = false"
              x-transition:enter="transition-opacity ease-linear duration-300"
              x-transition:enter-start="opacity-0"

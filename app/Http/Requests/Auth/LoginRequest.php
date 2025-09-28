@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Helpers\CaptchaHelper;
 
 class LoginRequest extends FormRequest
 {
@@ -29,7 +30,38 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'captcha' => ['required', 'numeric'],
+            'captcha_hash' => ['required', 'string'],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (!$this->validateCaptcha()) {
+                $validator->errors()->add('captcha', 'Jawaban keamanan tidak benar.');
+            }
+        });
+    }
+
+    /**
+     * Validate CAPTCHA answer
+     */
+    protected function validateCaptcha(): bool
+    {
+        $userAnswer = $this->input('captcha');
+        $hashedAnswer = $this->input('captcha_hash');
+        $sessionHash = session('captcha_hash');
+
+        // Verify the hash matches session
+        if ($hashedAnswer !== $sessionHash) {
+            return false;
+        }
+
+        return CaptchaHelper::validate($userAnswer, $hashedAnswer);
     }
 
     /**
@@ -50,6 +82,9 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+        
+        // Clear CAPTCHA session after successful login
+        session()->forget('captcha_hash');
     }
 
     /**

@@ -9,15 +9,28 @@ use App\Http\Controllers\Admin\RuanganController;
 use App\Http\Controllers\Admin\ProfesiController;
 use App\Http\Controllers\Admin\KategoriDokumenController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Admin\KaryawanController as AdminKaryawanController;
 use App\Http\Controllers\Admin\LaporanController;
+use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+// CAPTCHA refresh route
+Route::get('/captcha/refresh', function () {
+    $captcha = App\Helpers\CaptchaHelper::generate();
+    session(['captcha_hash' => $captcha['hash']]);
+    
+    return response()->json([
+        'question' => $captcha['question'],
+        'hash' => $captcha['hash']
+    ]);
+})->name('captcha.refresh');
 
 // QR Code routes (token-based public verification)
 Route::get('/qr/v/{token}', [QRCodeController::class, 'publicToken'])->name('qr.public');
@@ -59,6 +72,7 @@ Route::middleware(['auth', 'profile.completed'])->group(function () {
         Route::get('/', [DokumenController::class, 'index'])->name('index');
         Route::get('/create', [DokumenController::class, 'create'])->name('create');
         Route::post('/', [DokumenController::class, 'store'])->name('store');
+        Route::get('/{dokumen}/preview', [DokumenController::class, 'preview'])->name('preview');
     Route::get('/{dokumen}/download', [DokumenController::class, 'download'])->name('download');
         Route::delete('/{dokumen}', [DokumenController::class, 'destroy'])->name('destroy');
     });
@@ -87,6 +101,13 @@ Route::middleware(['auth', 'profile.completed'])->group(function () {
         Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::get('/settings/system-info', [SettingsController::class, 'systemInfo'])->name('settings.system-info');
         
+        // Security routes
+        Route::prefix('security')->name('security.')->group(function () {
+            Route::get('/logs', [LogViewerController::class, 'index'])->name('logs');
+            Route::get('/activity', [SecurityController::class, 'activity'])->name('activity');
+            Route::get('/check-bruteforce', [SecurityController::class, 'checkBruteforce'])->name('check-bruteforce');
+        });
+        
         // Approval routes
         Route::prefix('approval')->name('approval.')->group(function () {
             Route::get('/', [ApprovalController::class, 'index'])->name('index');
@@ -111,6 +132,7 @@ Route::middleware(['auth', 'profile.completed'])->group(function () {
         Route::resource('dokumen', \App\Http\Controllers\Admin\DokumenController::class)
             ->parameters(['dokumen' => 'dokumen']);
         Route::get('dokumen/{dokumen}/download', [\App\Http\Controllers\Admin\DokumenController::class, 'download'])->name('dokumen.download');
+        Route::get('dokumen/{dokumen}/preview', [\App\Http\Controllers\Admin\DokumenController::class, 'preview'])->name('dokumen.preview');
     });
 
     // Profile routes

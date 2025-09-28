@@ -1,7 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="w-full py-6">
+<div class="w-full py-6" x-data="{
+        open: false,
+        formId: null,
+        filename: '',
+        openModal(detail) {
+            this.formId = detail?.formId || null;
+            this.filename = detail?.filename || '';
+            this.open = true;
+            this.$nextTick(() => { this.$refs.cancelBtn?.focus(); });
+        },
+        close() {
+            this.open = false;
+            this.formId = null;
+            this.filename = '';
+        },
+        confirmDelete() {
+            if (!this.formId) return;
+            const form = document.getElementById(this.formId);
+            if (form) form.submit();
+            this.close();
+        }
+    }" @keydown.escape.window="open && close()" @open-delete="openModal($event.detail)">
     @if(request()->boolean('debug'))
     @php
         $user = auth()->user();
@@ -52,8 +73,27 @@
                         $lowerExt = strtolower($ext);
                         $isImage = in_array($lowerExt, ['jpg','jpeg','png','gif','webp']);
                         $isPdf = $lowerExt === 'pdf';
-                        $fileRel = '/storage/'.ltrim($d->file_path,'/');
+                        // Use secure preview route for private/legacy files
+                        $fileRel = route('dokumen.preview', $d);
                         $thumbRel = $fileRel;
+                        // Hitung ukuran file dari storage privat; fallback ke public
+                        $sizeBytes = null;
+                        try {
+                            if ($d->file_path) {
+                                if (Storage::disk('local')->exists($d->file_path)) {
+                                    $sizeBytes = Storage::disk('local')->size($d->file_path);
+                                } elseif (Storage::disk('public')->exists($d->file_path)) {
+                                    $sizeBytes = Storage::disk('public')->size($d->file_path);
+                                }
+                            }
+                        } catch (\Throwable $e) { $sizeBytes = null; }
+                        $sizeHuman = '-';
+                        if (is_int($sizeBytes)) {
+                            $units = ['B','KB','MB','GB','TB'];
+                            $pow = $sizeBytes > 0 ? floor(log($sizeBytes, 1024)) : 0;
+                            $pow = min($pow, count($units)-1);
+                            $sizeHuman = number_format($sizeBytes / pow(1024, $pow), $pow >= 2 ? 2 : 0).' '.$units[$pow];
+                        }
                     @endphp
                     @if($isImage)
                         <div class="relative group">
@@ -105,14 +145,20 @@
                     <div class="font-medium">{{ $d->kategoriDokumen->nama_kategori ?? '-' }}</div>
                     <div class="mt-2 text-sm text-gray-500">Nama File</div>
                     <div class="truncate">{{ $d->file_name }}</div>
+                    <div class="mt-2 text-sm text-gray-500">Ukuran</div>
+                    <div class="text-sm">{{ $sizeHuman }}</div>
                     <div class="mt-2 text-sm text-gray-500">Masa Berlaku</div>
                     <div class="text-sm">@if($d->berlaku_seumur_hidup) Seumur Hidup @else {{ optional($d->tanggal_mulai)->format('d M Y') }} - {{ optional($d->tanggal_berakhir)->format('d M Y') }} @endif</div>
                     <div class="mt-4 flex items-center gap-2">
                         <a href="{{ route('dokumen.download', $d) }}" class="px-3 py-2 border rounded-lg hover:bg-gray-50">Unduh</a>
-                        <form action="{{ route('dokumen.destroy', $d) }}" method="POST">
+                        <form id="delete-form-{{ $d->id }}" action="{{ route('dokumen.destroy', $d) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button class="px-3 py-2 border rounded-lg text-red-600 hover:bg-red-50">Hapus</button>
+                <button type="submit"
+                    class="px-3 py-2 border rounded-lg text-red-600 hover:bg-red-50"
+                    @click.prevent="openModal({ formId: 'delete-form-{{ $d->id }}', filename: '{{ addslashes($d->file_name) }}' })">
+                                Hapus
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -120,9 +166,55 @@
                 <div class="col-span-full text-gray-600">Belum ada dokumen.</div>
             @endforelse
         </div>
+        @if(method_exists($dokumen, 'links'))
+        <div class="mt-6">
+            {{ $dokumen->withQueryString()->onEachSide(1)->links() }}
+        </div>
+        @endif
     @endif
+
+    <!-- Konfirmasi Hapus Dokumen (dipindah ke dalam root x-data) -->
+    <div x-cloak x-show="open" x-transition.opacity class="fixed inset-0 z-[12000]" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle" aria-describedby="confirmDeleteDesc">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="close()"></div>
+
+        <!-- Panel -->
+        <div class="relative h-full w-full flex items-end sm:items-center justify-center p-4 sm:p-6">
+            <div x-show="open" x-transition.opacity x-transition.duration.200ms
+                 class="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl ring-1 ring-slate-200 overflow-hidden">
+                <div class="px-6 sm:px-8 pt-6 pb-5 sm:pb-6">
+                    <div class="flex items-start gap-3">
+                        <div class="mt-0.5 flex-shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M4.93 19.07a10 10 0 1 1 14.14 0 10 10 0 0 1-14.14 0z" />
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 id="confirmDeleteTitle" class="text-lg sm:text-xl font-semibold text-slate-900">Hapus dokumen ini?</h2>
+                            <p id="confirmDeleteDesc" class="mt-1.5 text-sm leading-relaxed text-slate-600">Tindakan ini tidak bisa dibatalkan. Dokumen <span class="font-medium text-slate-900" x-text="filename"></span> akan dihapus permanen.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-slate-200"></div>
+                <div class="px-6 sm:px-8 py-4 sm:py-5 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 sm:gap-3.5">
+                    <button type="button" @click="close()" x-ref="cancelBtn"
+                            class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 sm:px-5 sm:py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-400">
+                        Batal
+                    </button>
+                    <button type="button" @click="confirmDelete()"
+                            class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2.5 sm:px-5 sm:py-3 text-sm font-semibold text-white hover:bg-red-700 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-1-3a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v3" />
+                        </svg>
+                        Ya, Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- (Modal global dipindah ke layout) -->
+<!-- (Modal pratinjau PDF global tetap di layout) -->
 @endsection
  

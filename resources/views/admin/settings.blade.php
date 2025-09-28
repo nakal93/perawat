@@ -224,14 +224,14 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-slate-900">Informasi Sistem</h3>
                     <button @click="load()" type="button" class="px-3 py-1.5 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-700" :disabled="loading">
-                        <span x-show="!loading">Muat</span>
-                        <span x-show="loading">Memuat…</span>
+                        <span x-show="!loading" x-cloak>Muat</span>
+                        <span x-show="loading" x-cloak>Memuat…</span>
                     </button>
                 </div>
                 <template x-if="error">
                     <p class="text-sm text-red-600" x-text="error"></p>
                 </template>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-show="info">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-show="info" x-cloak>
                     <div class="text-sm"><span class="text-slate-500">PHP:</span> <span class="font-medium" x-text="info.php_version"></span></div>
                     <div class="text-sm"><span class="text-slate-500">Laravel:</span> <span class="font-medium" x-text="info.laravel_version"></span></div>
                     <div class="text-sm"><span class="text-slate-500">Database:</span> <span class="font-medium" x-text="info.database_connection"></span></div>

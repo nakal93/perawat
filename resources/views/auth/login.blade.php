@@ -144,6 +144,42 @@
                         @endif
                     </div>
 
+                    <!-- CAPTCHA -->
+                    @php
+                        $captcha = App\Helpers\CaptchaHelper::generate();
+                        session(['captcha_hash' => $captcha['hash']]);
+                    @endphp
+                    <div>
+                        <label for="captcha" class="block text-sm font-medium text-white mb-2">
+                            <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            Keamanan - Berapa hasil dari: 
+                            <span id="captcha-question" class="font-bold text-yellow-200 text-lg">{{ $captcha['question'] }}</span> ?
+                            <button type="button" 
+                                    id="refresh-captcha" 
+                                    class="ml-2 inline-flex items-center px-2 py-1 bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg text-white/80 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                    title="Ganti soal matematika">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                            </button>
+                        </label>
+                        <div class="relative">
+                            <input id="captcha" 
+                                   type="number" 
+                                   name="captcha" 
+                                   required 
+                                   class="input-glow w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                                   placeholder="Masukkan jawaban (contoh: 15)"
+                                   autocomplete="off">
+                        </div>
+                        <input type="hidden" name="captcha_hash" id="captcha-hash" value="{{ $captcha['hash'] }}">
+                        @error('captcha')
+                            <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Submit Button -->
                     <button type="submit" 
                             class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg">
@@ -187,6 +223,58 @@
                     eye.innerHTML = showing
                         ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>'
                         : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.058 10.058 0 012.66-4.304m3.2-2.163A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.057 10.057 0 01-4.429 5.818M15 12a3 3 0 00-3-3m0 0a3 3 0 013 3m-3-3L3 21"/>';
+                }
+            });
+        }
+    })();
+
+    // CAPTCHA refresh functionality
+    (function(){
+        const refreshBtn = document.getElementById('refresh-captcha');
+        const questionSpan = document.getElementById('captcha-question');
+        const hashInput = document.getElementById('captcha-hash');
+        const captchaInput = document.getElementById('captcha');
+
+        if(refreshBtn && questionSpan && hashInput && captchaInput){
+            refreshBtn.addEventListener('click', async function(){
+                // Show loading state
+                const originalHtml = refreshBtn.innerHTML;
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
+                try {
+                    const response = await fetch('{{ route("captcha.refresh") }}');
+                    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Update the display
+                    questionSpan.textContent = data.question;
+                    hashInput.value = data.hash;
+                    captchaInput.value = ''; // Clear the input
+                    captchaInput.focus(); // Focus on input for user convenience
+
+                    // Show success feedback briefly
+                    refreshBtn.innerHTML = '<svg class="w-4 h-4 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                    
+                    setTimeout(() => {
+                        refreshBtn.innerHTML = originalHtml;
+                        refreshBtn.disabled = false;
+                    }, 1000);
+
+                } catch (error) {
+                    console.error('Error refreshing CAPTCHA:', error);
+                    
+                    // Show error feedback
+                    refreshBtn.innerHTML = '<svg class="w-4 h-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                    
+                    setTimeout(() => {
+                        refreshBtn.innerHTML = originalHtml;
+                        refreshBtn.disabled = false;
+                    }, 2000);
                 }
             });
         }

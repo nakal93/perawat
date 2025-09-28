@@ -313,35 +313,67 @@
 </div>
 
 @push('scripts')
+@once
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endonce
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Ensure charts are initialized only when canvases are visible (x-cloak/x-show safe)
+  function waitUntilVisible(el, cb, retries = 20, interval = 50) {
+    const isVisible = () => !!el && el.offsetParent !== null && el.clientWidth > 0 && el.clientHeight > 0;
+    if (isVisible()) return cb();
+    if (retries <= 0) return cb(); // fallback to avoid hanging if something goes wrong
+    setTimeout(() => waitUntilVisible(el, cb, retries - 1, interval), interval);
+  }
+
+  // Keep references to avoid duplicate inits and enable resize handling
+  const charts = {};
+  function attachResizer(key, canvas) {
+    try {
+      if (!('ResizeObserver' in window)) return;
+      const ro = new ResizeObserver(() => {
+        if (charts[key]) charts[key].resize();
+      });
+      ro.observe(canvas.parentElement || canvas);
+    } catch (e) { /* no-op */ }
+  }
     // Chart colors
     const colors = {
         primary: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#14b8a6'],
         hover: ['#2563eb', '#7c3aed', '#059669', '#d97706', '#dc2626', '#4f46e5', '#db2777', '#0d9488']
     };
 
+  // Convert HEX to RGBA with alpha
+  function hexToRgba(hex, alpha = 1) {
+    const h = hex.replace('#', '');
+    const bigint = parseInt(h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
     // Helper function to create chart data
-    function createChartData(labels, data, backgroundColor, borderColor) {
+  function createChartData(labels, data, backgroundColor, borderColor) {
         return {
             labels: labels,
             datasets: [{
                 data: data,
                 backgroundColor: backgroundColor,
-                borderColor: borderColor,
-                borderWidth: 2,
-                hoverBorderWidth: 3
+        borderColor: borderColor,
+        borderWidth: 1,
+        hoverBorderWidth: 2
             }]
         };
     }
 
     // Helper function to create chart options with click handler
-    function createChartOptions(title, filterParam, filterValue) {
+  function createChartOptions(title, filterParam, filterValue) {
         return {
             responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 1.8,
+      maintainAspectRatio: false, // fill container height to avoid jumpiness
+      resizeDelay: 100,
+      animation: { duration: 0 }, // prevent initial blink
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -392,20 +424,26 @@ document.addEventListener('DOMContentLoaded', function() {
         $ruanganIds = $ruangan->whereIn('nama_ruangan', $ruanganLabels)->pluck('id', 'nama_ruangan')->toArray();
     @endphp
     
-    const ruanganChart = new Chart(document.getElementById('ruanganChart'), {
+  const ruanganCanvas = document.getElementById('ruanganChart');
+  waitUntilVisible(ruanganCanvas, () => {
+    if (!charts.ruangan) {
+      charts.ruangan = new Chart(ruanganCanvas, {
         type: 'doughnut',
         data: createChartData(
-            @json($ruanganLabels),
-            @json($ruanganData),
-            colors.primary,
-            colors.hover
+          @json($ruanganLabels),
+          @json($ruanganData),
+          colors.primary.map(c => hexToRgba(c, 0.6)),
+          'rgba(226, 232, 240, 0.8)'
         ),
         options: createChartOptions(
-            'Per Ruangan',
-            'ruangan_id',
-            @json(array_values($ruanganIds))
+          'Per Ruangan',
+          'ruangan_id',
+          @json(array_values($ruanganIds))
         )
-    });
+      });
+      attachResizer('ruangan', ruanganCanvas);
+    }
+  });
 
     // Profesi Chart
     @php
@@ -415,49 +453,54 @@ document.addEventListener('DOMContentLoaded', function() {
         $profesiIds = $profesi->whereIn('nama_profesi', $profesiLabels)->pluck('id', 'nama_profesi')->toArray();
     @endphp
     
-    const profesiChart = new Chart(document.getElementById('profesiChart'), {
+  const profesiCanvas = document.getElementById('profesiChart');
+  waitUntilVisible(profesiCanvas, () => {
+    if (!charts.profesi) {
+      charts.profesi = new Chart(profesiCanvas, {
         type: 'bar',
         data: createChartData(
-            @json($profesiLabels),
-            @json($profesiData),
-            colors.primary[1],
-            colors.hover[1]
+          @json($profesiLabels),
+          @json($profesiData),
+          hexToRgba(colors.primary[1], 0.6),
+          'rgba(226, 232, 240, 0.8)'
         ),
-        options: {
-            ...createChartOptions(
-                'Per Profesi',
-                'profesi_id',
-                @json(array_values($profesiIds))
-            ),
-            aspectRatio: 2,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: '#f1f5f9'
-                    },
-                    ticks: {
-                        color: '#64748b',
-                        font: {
-                            size: 10
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#64748b',
-                        maxRotation: 0,
-                        font: {
-                            size: 9
-                        }
-                    }
+    options: {
+          ...createChartOptions(
+            'Per Profesi',
+            'profesi_id',
+            @json(array_values($profesiIds))
+          ),
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: '#f1f5f9'
+              },
+              ticks: {
+                color: '#64748b',
+                font: {
+                  size: 10
                 }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#64748b',
+                maxRotation: 0,
+                font: {
+                  size: 9
+                }
+              }
             }
+          }
         }
-    });
+      });
+      attachResizer('profesi', profesiCanvas);
+    }
+  });
 
     // Status Pegawai Chart
     @php
@@ -467,20 +510,26 @@ document.addEventListener('DOMContentLoaded', function() {
         $statusIds = $statusPegawai->whereIn('nama', $statusLabels)->pluck('id', 'nama')->toArray();
     @endphp
     
-    const statusChart = new Chart(document.getElementById('statusChart'), {
+  const statusCanvas = document.getElementById('statusChart');
+  waitUntilVisible(statusCanvas, () => {
+    if (!charts.status) {
+      charts.status = new Chart(statusCanvas, {
         type: 'pie',
         data: createChartData(
-            @json($statusLabels),
-            @json($statusData),
-            colors.primary.slice(2),
-            colors.hover.slice(2)
+          @json($statusLabels),
+          @json($statusData),
+          colors.primary.slice(2).map(c => hexToRgba(c, 0.6)),
+          'rgba(226, 232, 240, 0.8)'
         ),
         options: createChartOptions(
-            'Status Pegawai',
-            'status_pegawai_id',
-            @json(array_values($statusIds))
+          'Status Pegawai',
+          'status_pegawai_id',
+          @json(array_values($statusIds))
         )
-    });
+      });
+      attachResizer('status', statusCanvas);
+    }
+  });
 
     // Gender Chart
     @php
@@ -489,20 +538,26 @@ document.addEventListener('DOMContentLoaded', function() {
         $genderData = $genderStats->values()->toArray();
     @endphp
     
-    const genderChart = new Chart(document.getElementById('genderChart'), {
+  const genderCanvas = document.getElementById('genderChart');
+  waitUntilVisible(genderCanvas, () => {
+    if (!charts.gender) {
+      charts.gender = new Chart(genderCanvas, {
         type: 'doughnut',
         data: createChartData(
-            @json($genderLabels),
-            @json($genderData),
-            ['#ec4899', '#3b82f6'],
-            ['#db2777', '#2563eb']
+          @json($genderLabels),
+          @json($genderData),
+          ['#ec4899', '#3b82f6'].map(c => hexToRgba(c, 0.6)),
+          'rgba(226, 232, 240, 0.8)'
         ),
         options: createChartOptions(
-            'Jenis Kelamin',
-            'jenis_kelamin',
-            @json($genderLabels)
+          'Jenis Kelamin',
+          'jenis_kelamin',
+          @json($genderLabels)
         )
-    });
+      });
+      attachResizer('gender', genderCanvas);
+    }
+  });
 });
 </script>
 @endpush

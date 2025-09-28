@@ -11,6 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withCommands([
+        \App\Console\Commands\MigrateDokumenToPrivate::class,
+        \App\Console\Commands\RenameDokumenDeterministic::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         // Trust proxy headers for HTTPS and proxy setup
         $middleware->trustProxies(at: [
@@ -23,6 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'profile.completed' => \App\Http\Middleware\EnsureProfileCompleted::class,
         ]);
+
+        // Apply custom security headers to all web routes
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

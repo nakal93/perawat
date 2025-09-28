@@ -82,7 +82,7 @@
                             </div>
                             <div>
                                 <div class="text-2xl font-bold">{{ $profesi->karyawan->count() }}</div>
-                                <div class="text-blue-100">Total Karyawan</div>
+                                <div class="text-blue-100">Total {{ strtolower($profesi->nama_profesi) }}</div>
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                             </div>
                             <div>
                                 <div class="text-2xl font-bold">{{ $profesi->karyawan->where('status_kelengkapan', 'tahap2')->count() }}</div>
-                                <div class="text-green-100">Karyawan Aktif</div>
+                                <div class="text-green-100">{{ ucfirst(strtolower($profesi->nama_profesi)) }} Aktif</div>
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
                             <span class="font-medium">#{{ $profesi->id }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Total Karyawan:</span>
+                            <span class="text-gray-500">Total {{ strtolower($profesi->nama_profesi) }}:</span>
                             <span class="font-medium">{{ $profesi->karyawan->count() }} orang</span>
                         </div>
                         <div class="flex justify-between">
@@ -154,7 +154,7 @@
             <div class="mt-8">
                 <div class="bg-white rounded-lg shadow">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Karyawan dengan Profesi Ini</h3>
+                        <h3 class="text-lg font-medium text-gray-900">{{ ucfirst(strtolower($profesi->nama_profesi)) }} dengan Profesi Ini</h3>
                     </div>
                     <div class="divide-y divide-gray-200">
                         @foreach($profesi->karyawan->take(5) as $karyawan)
@@ -177,7 +177,7 @@
                         @if($profesi->karyawan->count() > 5)
                             <div class="px-6 py-4 text-center">
                                 <span class="text-sm text-gray-500">
-                                    Dan {{ $profesi->karyawan->count() - 5 }} karyawan lainnya...
+                                    Dan {{ $profesi->karyawan->count() - 5 }} {{ strtolower($profesi->nama_profesi) }} lainnya...
                                 </span>
                             </div>
                         @endif

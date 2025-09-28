@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide Alpine-managed regions until it boots to avoid flash of uninitialized content */
+@layer utilities {
+	[x-cloak] { display: none !important; }
+}

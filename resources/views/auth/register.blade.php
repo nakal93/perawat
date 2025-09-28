@@ -437,6 +437,56 @@
                         </div>
                     </div>
 
+                    <!-- CAPTCHA -->
+                    <div class="bg-gradient-to-r from-purple-400/20 to-pink-500/20 border border-purple-300/30 rounded-xl p-4 backdrop-blur-sm">
+                        <label for="captcha" class="block text-sm font-medium text-purple-100 mb-3">
+                            Verifikasi Keamanan
+                        </label>
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-1">
+                                <div class="bg-white/10 border border-white/20 rounded-lg px-4 py-3 mb-3">
+                                    <span class="text-white font-mono text-lg" id="captcha-question">
+                                        @php
+                                            $captcha = app('App\Helpers\CaptchaHelper')->generate();
+                                            session(['captcha_answer' => $captcha['answer']]);
+                                            echo $captcha['question'];
+                                        @endphp
+                                    </span>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2">
+                                    <input 
+                                        id="captcha" 
+                                        name="captcha" 
+                                        type="number" 
+                                        required 
+                                        placeholder="Jawaban"
+                                        class="flex-1 h-12 px-4 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent backdrop-blur-sm transition-all duration-300" />
+                                    
+                                    <button 
+                                        type="button" 
+                                        id="refresh-captcha"
+                                        class="h-12 w-12 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-300/30 rounded-lg flex items-center justify-center text-purple-200 hover:text-white transition-all duration-200"
+                                        title="Refresh CAPTCHA">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        <span id="refresh-status" class="hidden absolute">
+                                            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @error('captcha')
+                            <p class="mt-2 text-sm text-red-300">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Submit Button -->
                     <button type="submit" 
                             class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-lg text-lg">
@@ -565,6 +615,48 @@
             updatePreview();
             if (pw) {
                 pw.addEventListener('input', validatePasswordInline);
+            }
+
+            // CAPTCHA refresh functionality
+            const refreshButton = document.getElementById('refresh-captcha');
+            const captchaQuestion = document.getElementById('captcha-question');
+            const captchaInput = document.getElementById('captcha');
+            const refreshStatus = document.getElementById('refresh-status');
+
+            if (refreshButton && captchaQuestion) {
+                refreshButton.addEventListener('click', async function() {
+                    try {
+                        // Show loading state
+                        refreshButton.disabled = true;
+                        refreshButton.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle><path class="opacity-75" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4 12a8 8 0 018-8" /></svg>';
+                        
+                        // Fetch new CAPTCHA
+                        const response = await fetch('/captcha/refresh');
+                        if (response.ok) {
+                            const data = await response.json();
+                            captchaQuestion.textContent = data.question;
+                            if (captchaInput) {
+                                captchaInput.value = '';
+                                captchaInput.focus();
+                            }
+                            
+                            // Show success state
+                            refreshButton.innerHTML = '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+                        } else {
+                            // Show error state
+                            refreshButton.innerHTML = '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                        }
+                    } catch (error) {
+                        // Show error state
+                        refreshButton.innerHTML = '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                    }
+                    
+                    // Reset button state after 2 seconds
+                    setTimeout(() => {
+                        refreshButton.disabled = false;
+                        refreshButton.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>';
+                    }, 2000);
+                });
             }
         });
     </script>

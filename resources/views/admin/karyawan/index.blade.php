@@ -9,8 +9,8 @@
         <div class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Manajemen Karyawan</h1>
-                    <p class="text-gray-600">Kelola data seluruh karyawan rumah sakit</p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Manajemen Komite Keperawatan</h1>
+                    <p class="text-gray-600">Kelola data seluruh Komite Keperawatan rumah sakit</p>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total Karyawan</p>
+                        <p class="text-sm font-medium text-gray-600">Total Komite Keperawatan</p>
                         <p class="text-2xl font-bold text-gray-900">{{ $stats['total'] ?? $karyawans->total() }}</p>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
         <!-- Karyawan Table -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Daftar Karyawan</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Daftar Komite Keperawatan</h3>
                 <p class="text-sm text-gray-600 mt-1">Menampilkan {{ $karyawans->count() }} dari {{ $karyawans->total() }} karyawan</p>
             </div>
 

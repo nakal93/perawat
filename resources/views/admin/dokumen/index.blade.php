@@ -8,7 +8,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Kelola Dokumen</h1>
-            <p class="text-gray-600 mt-1">Manajemen dokumen karyawan dan masa berlaku</p>
+            <p class="text-gray-600 mt-1">Manajemen dokumen Komite Keperawatan dan masa berlaku</p>
         </div>
             <a href="{{ route('admin.dokumen.create') }}" 
                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center mt-4 sm:mt-0">
@@ -144,6 +144,24 @@
                 @php
                     $isExpired = !$doc->berlaku_seumur_hidup && $doc->tanggal_berakhir && $doc->tanggal_berakhir->isPast();
                     $isExpiring = !$doc->berlaku_seumur_hidup && $doc->tanggal_berakhir && $doc->tanggal_berakhir->isFuture() && $doc->tanggal_berakhir->diffInDays(now()) <= 30;
+                    // Hitung ukuran file dari storage privat lalu fallback publik
+                    try {
+                        $sizeBytes = null;
+                        if ($doc->file_path) {
+                            if (Storage::disk('local')->exists($doc->file_path)) {
+                                $sizeBytes = Storage::disk('local')->size($doc->file_path);
+                            } elseif (Storage::disk('public')->exists($doc->file_path)) {
+                                $sizeBytes = Storage::disk('public')->size($doc->file_path);
+                            }
+                        }
+                    } catch (\Throwable $e) { $sizeBytes = null; }
+                    $sizeHuman = '-';
+                    if (is_int($sizeBytes)) {
+                        $units = ['B','KB','MB','GB','TB'];
+                        $pow = $sizeBytes > 0 ? floor(log($sizeBytes, 1024)) : 0;
+                        $pow = min($pow, count($units)-1);
+                        $sizeHuman = number_format($sizeBytes / pow(1024, $pow), $pow >= 2 ? 2 : 0).' '.$units[$pow];
+                    }
                 @endphp
                 <div class="p-6 hover:bg-gray-50">
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -176,7 +194,7 @@
                                         <strong>{{ $doc->karyawan->user->name ?? 'N/A' }}</strong> - 
                                         {{ $doc->kategoriDokumen->nama_kategori ?? 'N/A' }}
                                     </p>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-500">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-500">
                                         <div>
                                             <span class="font-medium">Mulai:</span> 
                                             {{ $doc->tanggal_mulai ? $doc->tanggal_mulai->format('d/m/Y') : 'N/A' }}
@@ -192,6 +210,10 @@
                                         <div>
                                             <span class="font-medium">Diunggah:</span> 
                                             {{ $doc->created_at->diffForHumans() }}
+                                        </div>
+                                        <div>
+                                            <span class="font-medium">Ukuran:</span>
+                                            {{ $sizeHuman }}
                                         </div>
                                     </div>
                                 </div>

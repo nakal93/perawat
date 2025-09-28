@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Karyawan;
+use App\Helpers\CaptchaHelper;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,7 +49,20 @@ class RegisteredUserController extends Controller
             'jenis_kelamin' => ['required', 'in:Laki-laki,Perempuan'],
             'ruangan_id' => ['required', 'exists:ruangan,id'],
             'profesi_id' => ['required', 'exists:profesi,id'],
+            'captcha' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    $captchaHelper = app(CaptchaHelper::class);
+                    if (!$captchaHelper->validate($value, session('captcha_answer'))) {
+                        $fail('Jawaban CAPTCHA tidak benar.');
+                    }
+                },
+            ],
         ]);
+
+        // Clear CAPTCHA session after successful validation
+        session()->forget('captcha_answer');
 
         $user = User::create([
             'name' => $request->name,

@@ -13,7 +13,8 @@ class ProfesiController extends Controller
      */
     public function index()
     {
-        $profesi = Profesi::paginate(10);
+        // Eager-load jumlah karyawan per profesi agar tidak selalu 0 di index
+        $profesi = Profesi::withCount('karyawan')->paginate(10);
         return view('admin.profesi.index', compact('profesi'));
     }
 

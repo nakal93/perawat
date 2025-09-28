@@ -78,24 +78,18 @@
                                 <p class="text-xs text-gray-500">Diunggah: {{ $dokumen->created_at->format('d/m/Y H:i') }}</p>
                             </div>
                             @if($dokumen->file_path)
-                                @if(file_exists(storage_path('app/public/' . $dokumen->file_path)))
-                                    <div class="flex gap-2">
-                                        <button type="button" 
-                                                onclick="togglePreview()"
-                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded">
-                                            <span id="preview-toggle-text">Tampilkan Preview</span>
-                                        </button>
-                                        <a href="{{ asset('storage/' . $dokumen->file_path) }}" 
-                                           target="_blank"
-                                           class="text-green-600 hover:text-green-800 text-sm font-medium bg-green-50 hover:bg-green-100 px-3 py-1 rounded">
-                                            Buka di Tab Baru
-                                        </a>
-                                    </div>
-                                @else
-                                    <div class="text-red-600 text-sm">
-                                        <span class="bg-red-50 px-2 py-1 rounded">File Tidak Ditemukan</span>
-                                    </div>
-                                @endif
+                                <div class="flex gap-2">
+                                    <button type="button" 
+                                            onclick="togglePreview()"
+                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded">
+                                        <span id="preview-toggle-text">Tampilkan Preview</span>
+                                    </button>
+                                    <a href="{{ route('admin.dokumen.preview', $dokumen) }}" 
+                                       target="_blank"
+                                       class="text-green-600 hover:text-green-800 text-sm font-medium bg-green-50 hover:bg-green-100 px-3 py-1 rounded">
+                                        Buka di Tab Baru
+                                    </a>
+                                </div>
                             @else
                                 <div class="text-gray-500 text-sm">
                                     <span class="bg-gray-50 px-2 py-1 rounded">Belum Ada File</span>
@@ -105,14 +99,13 @@
                         
                         <!-- Document Preview -->
                         @if($dokumen->file_path)
-                            @if(file_exists(storage_path('app/public/' . $dokumen->file_path)))
-                                <div id="document-preview" class="hidden border-t border-gray-200 pt-4">
-                                    @php
-                                        $fileExtension = strtolower(pathinfo($dokumen->file_name, PATHINFO_EXTENSION));
-                                        $fileUrl = asset('storage/' . $dokumen->file_path);
-                                    @endphp
-                                
-                                @if(in_array($fileExtension, ['jpg', 'jpeg', 'png']))
+                            <div id="document-preview" class="hidden border-t border-gray-200 pt-4">
+                                @php
+                                    $fileExtension = strtolower(pathinfo($dokumen->file_name, PATHINFO_EXTENSION));
+                                    $fileUrl = route('admin.dokumen.preview', $dokumen);
+                                @endphp
+
+                                @if(in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
                                     <!-- Image Preview -->
                                     <div class="text-center">
                                         <img src="{{ $fileUrl }}" 
@@ -148,22 +141,13 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                         </svg>
                                         <p class="text-gray-500 text-sm">Preview tidak tersedia untuk tipe file ini</p>
-                                        <a href="{{ $fileUrl }}" 
-                                           target="_blank"
+                                        <a href="{{ route('admin.dokumen.download', $dokumen) }}" 
                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 inline-block">
                                             Download File
                                         </a>
                                     </div>
                                 @endif
                             </div>
-                            @else
-                                <div class="border-t border-gray-200 pt-4">
-                                    <p class="text-gray-500 text-sm text-center py-4">
-                                        File tidak ditemukan di storage: {{ $dokumen->file_path }}
-                                        <br><small>Path mungkin telah berubah atau file dihapus</small>
-                                    </p>
-                                </div>
-                            @endif
                         @else
                             <div class="border-t border-gray-200 pt-4">
                                 <p class="text-gray-500 text-sm text-center py-4">Tidak ada file yang terupload untuk dokumen ini</p>
