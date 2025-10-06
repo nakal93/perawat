@@ -201,15 +201,32 @@ class LaporanController extends Controller
     {
         $query = $this->applyFilters($request, Karyawan::query());
         $karyawan = $query->get();
-        $filters = $request->only(['ruangan_id', 'profesi_id', 'status_pegawai_id', 'search']);
+        // Tampilkan semua filter yang aktif pada halaman print
+        $filters = $request->all();
         
         return view('admin.laporan-print', compact('karyawan', 'filters'));
     }
 
     public function exportExcel(Request $request)
     {
-        $fileName = 'laporan_karyawan_' . date('Y-m-d_H-i-s') . '.xlsx';
-        return Excel::download(new KaryawanExport($request), $fileName);
+        // Some production environments may miss the ZIP extension required for XLSX.
+        // Detect and gracefully fallback to CSV so the feature still works online.
+        $hasZip = extension_loaded('zip');
+        $timestamp = date('Y-m-d_H-i-s');
+        if ($hasZip) {
+            $fileName = "laporan_karyawan_{$timestamp}.xlsx";
+            try {
+                return Excel::download(new KaryawanExport($request), $fileName);
+            } catch (\Throwable $e) {
+                // If XLSX writer fails for any reason, fallback to CSV
+                $fallback = "laporan_karyawan_{$timestamp}.csv";
+                return Excel::download(new KaryawanExport($request), $fallback, \Maatwebsite\Excel\Excel::CSV);
+            }
+        }
+
+        // Fallback path when ext-zip is not available: return CSV directly
+        $fileName = "laporan_karyawan_{$timestamp}.csv";
+        return Excel::download(new KaryawanExport($request), $fileName, \Maatwebsite\Excel\Excel::CSV);
     }
 
     public function exportPdf(Request $request)
@@ -222,8 +239,16 @@ class LaporanController extends Controller
             'filters' => $request->all(),
         ])->render();
 
-        // Konfigurasi mPDF
-        $mpdf = new \Mpdf\Mpdf(['format' => 'A4-L']);
+        // Konfigurasi mPDF dengan tempDir yang dapat ditulis di production
+        $tempDir = storage_path('app/mpdf_temp');
+        if (!is_dir($tempDir)) {
+            @mkdir($tempDir, 0775, true);
+        }
+        $mpdf = new \Mpdf\Mpdf([
+            'format' => 'A4-L',
+            'tempDir' => $tempDir,
+            'default_font' => 'dejavusans',
+        ]);
         $mpdf->SetTitle('Laporan Karyawan');
         $mpdf->WriteHTML($html);
         $output = $mpdf->Output('', 'S'); // as string

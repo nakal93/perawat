@@ -309,6 +309,8 @@ File deployment yang sudah disiapkan:
 | **Database connection error** | Verifikasi kredensial DB di `.env` dan pastikan service MySQL/PostgreSQL aktif |
 | **QR Code error** | Install ekstensi PHP: `gd` dan `imagick` |
 | **Email tidak terkirim** | Periksa konfigurasi SMTP di `.env` dan pastikan "App Password" Gmail aktif |
+| **Export Excel gagal (ZipArchive error)** | Server production mungkin tidak punya ekstensi `zip`. Sistem akan otomatis fallback ke CSV. Solusi: aktifkan ekstensi `zip` untuk XLSX atau gunakan hasil CSV. |
+| **Export PDF gagal (Cannot write to temp dir)** | mPDF membutuhkan folder temp yang bisa ditulis. Sistem sudah diarahkan ke `storage/app/mpdf_temp`. Pastikan folder tersebut dapat dibuat/ditulis oleh PHP. |
 
 ### Performance Optimization
 
